@@ -34,6 +34,22 @@ class MainWidgets(object):
         self.passButton.pack(side='bottom')
 
 
+class TextBook(object):
+    def __init__(self, filePaths):
+        printStatus('Initialize Text Book ')
+        self.bookPaths = filePaths  # 文件位置，TBC的保存不是时时的，只在调用save时保存
+        self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
+
+    def saveFile(self):
+        pass  # TODO Saving function
+
+    def getNextChapter(self):
+        pass  # TODO Getting next chapter
+
+    def getNextPage(self):
+        pass  # TODO Getting next page
+
+
 def printStatus(values, end='\n', head=''):
     """
     Print the value with time string and status string.
@@ -48,7 +64,7 @@ def printStatus(values, end='\n', head=''):
 
 
 def tUpdateXY():
-    printStatus(MAIN_WINDOW.geometry(),head='window geometry:')
+    printStatus(MAIN_WINDOW.geometry(), head='window geometry:')
 
 
 if __name__ == "__main__":
