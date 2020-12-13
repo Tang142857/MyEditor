@@ -1,8 +1,9 @@
 """
-TextbookChecler
+TextbookChecker
 @author(Please add your name after this): Tang142857
 Copyright(c) DFSA Software Develop Center
 """
+
 import tkinter
 from time import localtime, strftime, time
 
