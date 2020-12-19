@@ -1,3 +1,4 @@
 /.vscode
 textbookchecker.code-workspace
 Thumbs.db
+/__pycache__

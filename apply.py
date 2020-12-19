@@ -6,32 +6,7 @@ Copyright(c) DFSA Software Develop Center
 
 import tkinter
 from time import localtime, strftime, time
-
-
-class MainWidgets(object):
-    def __init__(self, tks: tkinter.Tk):
-        self.tks = tks
-        printStatus('Initializing the widgets...')
-        self.tks.geometry('630x306+355+200')
-        # Set window attribute end
-
-        self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
-        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=100, height=100)
-        # Frame initialize end
-
-        # Widget initialize start
-        self.passButton = tkinter.Button(self.fastWidgetsFrame,
-                                         text='pass',
-                                         height=1,
-                                         command=tUpdateXY,
-                                         font=('microsoftyamei', 10))
-        self.applyWidgets()
-
-    def applyWidgets(self):
-        printStatus('apply widgets...')
-        self.displayFrame.pack(side='left', fill='both')
-        self.fastWidgetsFrame.pack(side='right', fill='both')
-        self.passButton.pack(side='bottom')
+import ui
 
 
 class TextBook(object):
@@ -69,6 +44,6 @@ def tUpdateXY():
 
 if __name__ == "__main__":
     MAIN_WINDOW = tkinter.Tk()
-    UI_WIDGETS = MainWidgets(MAIN_WINDOW)
-    print(MAIN_WINDOW.geometry())
+    UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
+    # print(MAIN_WINDOW.geometry())
     MAIN_WINDOW.mainloop()  # 调用主循环
