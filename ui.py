@@ -26,16 +26,18 @@ class MainWidgets(object):
         # Set window attribute end
 
         self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
-        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=100, height=100)
+        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=2000, height=100)
         # Frame initialize end
 
         # Widget initialize start
-        self.passButton = tkinter.Button(self.fastWidgetsFrame, text=' pass ', height=2, font=('microsoftyamei', 10))
-        self.reviewButton = tkinter.Button(self.fastWidgetsFrame,text='review',height=2,font=('microsoftyamei', 10))
+        self.contentViewText = tkinter.Text(self.displayFrame, font=('microsoftyahei', 10))
+        self.passButton = tkinter.Button(self.fastWidgetsFrame, text=' pass ', height=2, font=('microsoftyahei', 10))
+        self.reviewButton = tkinter.Button(self.fastWidgetsFrame, text='review', height=2, font=('microsoftyahei', 10))
         self.applyWidgets()
 
     def applyWidgets(self):
-        self.displayFrame.pack(side='left', fill='both')
-        self.fastWidgetsFrame.pack(side='right', fill='both')
-        self.passButton.pack(side='bottom')
-        self.reviewButton.pack(side='top')
+        self.displayFrame.pack(side='left', fill='both', expand=True)
+        self.contentViewText.pack(expand=True, fill='both')
+        self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
+        self.passButton.pack(side='bottom',expand=True,fill='x')
+        self.reviewButton.pack(side='top',expand=True,fill='x')

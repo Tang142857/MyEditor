@@ -1,6 +1,6 @@
 """
 TextbookChecker
-@author(Please add your name after this): Tang142857
+@author: Tang142857
 Copyright(c) DFSA Software Develop Center
 """
 
@@ -18,11 +18,22 @@ class TextBook(object):
     def saveFile(self):
         pass  # TODO Saving function
 
+    def getNextPage(self):
+        pass  # TODO Getting next page
+
     def getNextChapter(self):
         pass  # TODO Getting next chapter
 
-    def getNextPage(self):
-        pass  # TODO Getting next page
+
+class EventHost(object):
+    def passPageEvent(self):
+        printStatus('pass page event.')
+        # TODO pass age event
+    
+    def reviewPageEvent(self):
+        printStatus('review page event.')
+        # TODO review page event.
+
 
 
 def printStatus(values, end='\n', head=''):
@@ -45,5 +56,7 @@ def tUpdateXY():
 if __name__ == "__main__":
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
-    # print(MAIN_WINDOW.geometry())
+    EVENT_HOST=EventHost()
+    printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
+    UI_WIDGETS.contentViewText.insert(tkinter.INSERT,'hello world')
     MAIN_WINDOW.mainloop()  # 调用主循环
