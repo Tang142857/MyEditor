@@ -20,8 +20,9 @@ import tkinter
 
 
 class MainWidgets(object):
-    def __init__(self, tks: tkinter.Tk):
+    def __init__(self, tks: tkinter.Tk, EH):
         self.tks = tks
+        self.eventHost = EH
         self.tks.geometry('630x306+355+200')
         # Set window attribute end
 
@@ -31,13 +32,21 @@ class MainWidgets(object):
 
         # Widget initialize start
         self.contentViewText = tkinter.Text(self.displayFrame, font=('microsoftyahei', 10))
-        self.passButton = tkinter.Button(self.fastWidgetsFrame, text=' pass ', height=2, font=('microsoftyahei', 10))
-        self.reviewButton = tkinter.Button(self.fastWidgetsFrame, text='review', height=2, font=('microsoftyahei', 10))
+        self.passButton = tkinter.Button(self.fastWidgetsFrame,
+                                         text=' pass ',
+                                         height=2,
+                                         font=('microsoftyahei', 10),
+                                         command=self.eventHost.passPageEvent)
+        self.reviewButton = tkinter.Button(self.fastWidgetsFrame,
+                                           text='review',
+                                           height=2,
+                                           font=('microsoftyahei', 10),
+                                           command=self.eventHost.reviewPageEvent)
         self.applyWidgets()
 
     def applyWidgets(self):
         self.displayFrame.pack(side='left', fill='both', expand=True)
         self.contentViewText.pack(expand=True, fill='both')
         self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
-        self.passButton.pack(side='bottom',expand=True,fill='x')
-        self.reviewButton.pack(side='top',expand=True,fill='x')
+        self.passButton.pack(side='bottom', expand=True, fill='x')
+        self.reviewButton.pack(side='top', expand=True, fill='x')

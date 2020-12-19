@@ -7,6 +7,7 @@ Copyright(c) DFSA Software Develop Center
 import tkinter
 from time import localtime, strftime, time
 import ui
+import debug
 
 
 class TextBook(object):
@@ -29,11 +30,10 @@ class EventHost(object):
     def passPageEvent(self):
         printStatus('pass page event.')
         # TODO pass age event
-    
+
     def reviewPageEvent(self):
         printStatus('review page event.')
         # TODO review page event.
-
 
 
 def printStatus(values, end='\n', head=''):
@@ -55,8 +55,8 @@ def tUpdateXY():
 
 if __name__ == "__main__":
     MAIN_WINDOW = tkinter.Tk()
-    UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
-    EVENT_HOST=EventHost()
+    EVENT_HOST = EventHost()
+    UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)
     printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
-    UI_WIDGETS.contentViewText.insert(tkinter.INSERT,'hello world')
+    UI_WIDGETS.contentViewText.insert(tkinter.INSERT, 'hello world')
     MAIN_WINDOW.mainloop()  # 调用主循环
