@@ -5,28 +5,48 @@ Copyright(c) DFSA Software Develop Center
 """
 
 import tkinter
+import tkinter.messagebox
+import os
 from time import localtime, strftime, time
 import ui
 import debug
 
 
 class TextBook(object):
-    def __init__(self, filePaths):
+    def __init__(self, filePaths: str):
         printStatus('Initialize Text Book ')
         self.bookPaths = filePaths  # 文件位置，TBC的保存不是时时的，只在调用save时保存
         self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
+
+    def setNewBook(self, newPath: str):
+        printStatus(f'set new book,path: {newPath}')
+        self.bookOriginObject.close()  # 关闭上一本书
+        self.bookPaths = newPath
+        self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
+
+    def getNowPath(self):
+        """
+        提供给set方法的状态读取函数
+        """
+        printStatus('get book path.')
+        return self.bookPaths
 
     def saveFile(self):
         pass  # TODO Saving function
 
     def getNextPage(self):
-        pass  # TODO Getting next page
+        newContent = self.bookOriginObject.read(20)
+        return newContent
+        # TODO Getting next page
 
     def getNextChapter(self):
         pass  # TODO Getting next chapter
 
 
 class EventHost(object):
+    def __init__(self, Book: TextBook):
+        self.book = Book  # 绑定book
+
     def passPageEvent(self):
         printStatus('pass page event.')
         # TODO pass age event
@@ -34,6 +54,24 @@ class EventHost(object):
     def reviewPageEvent(self):
         printStatus('review page event.')
         # TODO review page event.
+
+    def setBookPath(self):
+        """
+        Set an new book.
+        """
+        def setNewBookPath():
+            newPath = setWidgets.inputWidget.get()
+            if os.path.isfile(newPath):
+                printStatus(f'new path {newPath}')
+                self.book.setNewBook(newPath)
+            else:
+                tkinter.messagebox.showwarning('Warning','File can not be read,please check your path.')
+            setBookPathWindow.quit()
+            setBookPathWindow.destroy()  # toplevel的玄学东西，quit之后还要加上destroy
+
+        setBookPathWindow = tkinter.Toplevel()
+        setWidgets = ui.SetBookPathWindow(setBookPathWindow, setNewBookPath)
+        setBookPathWindow.mainloop()
 
 
 def printStatus(values, end='\n', head=''):
@@ -54,9 +92,12 @@ def tUpdateXY():
 
 
 if __name__ == "__main__":
+    BOOK_OBJ = TextBook('D:\\relaxing\\factions\\countryside_teacher\\ct.txt')
+    EVENT_HOST = EventHost(BOOK_OBJ)
     MAIN_WINDOW = tkinter.Tk()
-    EVENT_HOST = EventHost()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)
+    # initialize object end
+
     printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
     UI_WIDGETS.contentViewText.insert(tkinter.INSERT, 'hello world')
     MAIN_WINDOW.mainloop()  # 调用主循环
