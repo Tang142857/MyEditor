@@ -20,7 +20,7 @@ class MainWidgets(object):
         self.tks = tks
         self.eventHosts = EH
         self.tks.geometry('630x306+355+200')
-        self.tks.title('Text Book Checker')
+        # self.tks.title('Text Book Checker')
         # Set window attribute end
         self.mainWindowMenu = tkinter.Menu(self.tks)
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
