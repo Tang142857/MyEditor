@@ -3,7 +3,7 @@ TextbookChecker
 @author: Tang142857
 Copyright(c) DFSA Software Develop Center
 """
-
+import json
 import tkinter
 import tkinter.messagebox
 import os
@@ -12,28 +12,31 @@ import ui
 import debug
 
 
-class TextBook(object):
+class Book(object):
     def __init__(self, filePaths: str):
+        """
+        Initialize the book ,when TBC running the can only have one book.
+        """
         printStatus('Initialize Text Book ')
-        self.setNewBook(filePaths)
-        # self.bookPaths = filePaths  # 文件位置，TBC的保存不是时时的，只在调用save时保存
-        # self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
+        self.bookPaths = None
+        self.bookOriginObject = None
+        self.formatedBook = None
+        self.setNewBook(filePaths)  # set the path point to the origin book
 
     def setNewBook(self, newPath: str):
         printStatus(f'set new book,path: {newPath}')
         try:
             self.bookOriginObject.close()  # 关闭上一本书
         except AttributeError:
-            pass
+            pass  # if there happen attribute error ,it maight be initialize the book,pass it.
         self.bookPaths = newPath
         self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
         MAIN_WINDOW.title(f'Text Book Reader-{self.bookPaths}')
 
     def getNowPath(self):
         """
-        提供给set方法的状态读取函数
+        Get now working book path.
         """
-        printStatus('get book path.')
         return self.bookPaths
 
     def saveFile(self):
@@ -46,6 +49,12 @@ class TextBook(object):
 
     def getNextChapter(self):
         pass  # TODO Getting next chapter
+
+
+class TextBook(Book):
+    """Text book is almost the same as book object ,it needn't to laod the ftb file."""
+    def __init__(self, filePath: str):
+        super().__init__(filePath)  # Directly using init function is OK.
 
 
 class EventHost(object):
@@ -84,7 +93,7 @@ class EventHost(object):
         Copy now content to copyboard
         """
         import pyperclip
-        nowContent = UI_WIDGETS.contentViewText.get(1.0,'end')
+        nowContent = UI_WIDGETS.contentViewText.get(1.0, 'end')
         pyperclip.copy(nowContent)
         del pyperclip  # Clean up the memory
 
@@ -107,8 +116,13 @@ def tUpdateXY():
 
 
 if __name__ == "__main__":
+    with open('resource/configure.json', 'r', encoding='utf-8') as configure:
+        CONFIGURE = json.loads(configure.read())
+        print(CONFIGURE)
+    # Load configure file end.
+
     MAIN_WINDOW = tkinter.Tk()
-    BOOK_OBJ = TextBook('D:\\relaxing\\factions\\countryside_teacher\\ct.txt')
+    BOOK_OBJ = TextBook(CONFIGURE['bookPath'])
     EVENT_HOST = EventHost(BOOK_OBJ)
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
     # initialize object end
