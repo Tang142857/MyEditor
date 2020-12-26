@@ -54,7 +54,7 @@ class EventHost(object):
 
     def passPageEvent(self):
         printStatus('pass page event.')
-        UI_WIDGETS.contentViewText.insert('insert',self.book.getNextPage())
+        UI_WIDGETS.contentViewText.insert('insert', self.book.getNextPage())
         # TODO pass age event
 
     def reviewPageEvent(self):
@@ -78,6 +78,15 @@ class EventHost(object):
         setBookPathWindow = tkinter.Toplevel()
         setWidgets = ui.SetBookPathWindow(setBookPathWindow, setNewBookPath)
         setBookPathWindow.mainloop()
+
+    def copyContent(self):
+        """
+        Copy now content to copyboard
+        """
+        import pyperclip
+        nowContent = UI_WIDGETS.contentViewText.get(1.0,'end')
+        pyperclip.copy(nowContent)
+        del pyperclip  # Clean up the memory
 
 
 def printStatus(values, end='\n', head=''):

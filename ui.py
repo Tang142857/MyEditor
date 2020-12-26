@@ -20,11 +20,13 @@ class MainWidgets(object):
         self.tks = tks
         self.eventHosts = EH
         self.tks.geometry('630x306+355+200')
-        # self.tks.title('Text Book Checker')
         # Set window attribute end
+
         self.mainWindowMenu = tkinter.Menu(self.tks)
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
-        fileMenu.add_command(label='Book Path', command=self.eventHosts.setBookPath)
+        fileMenu.add_command(label='Open', command=self.eventHosts.setBookPath)
+        fileMenu.add_separator()
+        fileMenu.add_command(label='Copy', command=self.eventHosts.copyContent)
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
 
         self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
@@ -51,7 +53,7 @@ class MainWidgets(object):
         self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
         self.passButton.pack(side='bottom', expand=True, fill='x')
         self.reviewButton.pack(side='top', expand=True, fill='x')
-        self.tks.config(menu=self.mainWindowMenu)
+        self.tks.config(menu=self.mainWindowMenu)  # 放置菜单
 
 
 class SetBookPathWindow(object):
