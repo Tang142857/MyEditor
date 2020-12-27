@@ -5,6 +5,7 @@ Copyright(c) DFSA Software Develop Center
 """
 import json
 import tkinter
+import re
 import tkinter.messagebox
 import os
 from time import localtime, strftime, time
@@ -12,25 +13,34 @@ import ui
 import debug
 
 
-class Book(object):
+class TextBook(object):
     def __init__(self, filePaths: str):
-        """
-        Initialize the book ,when TBC running the can only have one book.
-        """
+        """Initialize the book ,when TBC running the can only have one book."""
         printStatus('Initialize Text Book ')
         self.bookPaths = None
         self.bookOriginObject = None
         self.formatedBook = None
+
         self.setNewBook(filePaths)  # set the path point to the origin book
 
-    def setNewBook(self, newPath: str):
-        printStatus(f'set new book,path: {newPath}')
+    def __makeBookName(self, Paths: str):
+        """Make the formated book name."""
+        baseFileName = re.split(r'[\\/]', Paths)[-1]
+        return Paths.replace(baseFileName, '$' + baseFileName)
+
+    def setNewBook(self, newPaths: str):
+        printStatus(f'set new book,path: {newPaths}')
         try:
             self.bookOriginObject.close()  # 关闭上一本书
+            self.formatedBook.close()
         except AttributeError:
             pass  # if there happen attribute error ,it maight be initialize the book,pass it.
-        self.bookPaths = newPath
-        self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
+        # finish closing the last book
+
+        self.bookPaths = newPaths
+        self.bookOriginObject = open(self.bookPaths, encoding='utf-8', buffering=True)
+        self.formatedBook = open(self.__makeBookName(newPaths), 'a', encoding='utf-8',
+                                 buffering=True)  # creat formatted book name
         MAIN_WINDOW.title(f'Text Book Reader-{self.bookPaths}')
 
     def getNowPath(self):
@@ -40,21 +50,17 @@ class Book(object):
         return self.bookPaths
 
     def saveFile(self):
-        pass  # TODO Saving function
+        self.formatedBook.flush()  # Write the content in memory to the file.
 
     def getNextPage(self):
-        newContent = self.bookOriginObject.read(20)
+        """Add changed content to the memory and return new content."""
+        newContent = self.bookOriginObject.read(100)
+
+        self.formatedBook.write(UI_WIDGETS.contentViewText.get(1.0, 'end'))  # Read the content and add to the memory
+        UI_WIDGETS.contentViewText.delete(1.0, 'end')  # Delete the remaining text.
+
         return newContent
         # TODO Getting next page better
-
-    def getNextChapter(self):
-        pass  # TODO Getting next chapter
-
-
-class TextBook(Book):
-    """Text book is almost the same as book object ,it needn't to laod the ftb file."""
-    def __init__(self, filePath: str):
-        super().__init__(filePath)  # Directly using init function is OK.
 
 
 class EventHost(object):
@@ -96,6 +102,11 @@ class EventHost(object):
         nowContent = UI_WIDGETS.contentViewText.get(1.0, 'end')
         pyperclip.copy(nowContent)
         del pyperclip  # Clean up the memory
+
+    def saveFile(self):
+        """Save file to the formatted file."""
+        printStatus('Saving file.')
+        self.book.saveFile()  # Calling book object
 
 
 def printStatus(values, end='\n', head=''):

@@ -25,9 +25,11 @@ class MainWidgets(object):
         self.mainWindowMenu = tkinter.Menu(self.tks)
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
         fileMenu.add_command(label='Open', command=self.eventHosts.setBookPath)
+        fileMenu.add_command(label='Save', command=self.eventHosts.saveFile)
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.eventHosts.copyContent)
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
+        # Menu set end
 
         self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
         self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=2000, height=100)
