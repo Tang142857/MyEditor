@@ -7,8 +7,9 @@ All ui objects need father widgets,they will set ui in __init__ function
 """
 import tkinter
 
-COMMON_FONT = ('宋体', 13)
+COMMON_FONT = ('宋体', 12)
 VIEWER_FONT = ('宋体', 10)
+BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 # global variable end
 
 
@@ -31,31 +32,37 @@ class MainWidgets(object):
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end
 
-        self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
-        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=2000, height=100)
+        self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100, **BORDER_STYLE)
+        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=1500, height=100, **BORDER_STYLE)
+        self.fastSettingFrame = tkinter.Frame(self.fastWidgetsFrame, background='blue', height=150, **BORDER_STYLE)
         # Frame initialize end
 
-        # Widget initialize start
         self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
         self.passButton = tkinter.Button(self.fastWidgetsFrame,
-                                         text=' pass ',
+                                         text='  pass  ',
                                          height=2,
                                          font=('microsoftyahei', 10),
                                          command=self.eventHosts.passPageEvent)
         self.reviewButton = tkinter.Button(self.fastWidgetsFrame,
-                                           text='review',
+                                           text=' review ',
                                            height=2,
                                            font=('microsoftyahei', 10),
                                            command=self.eventHosts.reviewPageEvent)
+        # Widget initialize end
         self.applyWidgets()
 
     def applyWidgets(self):
-        self.displayFrame.pack(side='left', fill='both', expand=True)
-        self.contentViewText.pack(expand=True, fill='both')
+        self.tks.config(menu=self.mainWindowMenu)
+        # Place the menu.
+
         self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
-        self.passButton.pack(side='bottom', expand=True, fill='x')
+        self.displayFrame.pack(side='left', fill='both', expand=True)
+        # Place the frame widget.
+
+        self.contentViewText.pack(expand=True, fill='both')
         self.reviewButton.pack(side='top', expand=True, fill='x')
-        self.tks.config(menu=self.mainWindowMenu)  # 放置菜单
+        self.fastSettingFrame.pack(fill='both', expand=True)
+        self.passButton.pack(side='bottom', expand=True, fill='x')
 
 
 class SetBookPathWindow(object):

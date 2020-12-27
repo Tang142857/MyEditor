@@ -54,7 +54,7 @@ class TextBook(object):
 
     def getNextPage(self):
         """Add changed content to the memory and return new content."""
-        newContent = self.bookOriginObject.read(100)
+        newContent = self.bookOriginObject.read(400)
 
         self.formatedBook.write(UI_WIDGETS.contentViewText.get(1.0, 'end'))  # Read the content and add to the memory
         UI_WIDGETS.contentViewText.delete(1.0, 'end')  # Delete the remaining text.
