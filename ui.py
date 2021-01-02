@@ -39,14 +39,14 @@ class MainWidgets(object):
 
         self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
         self.passButton = tkinter.Button(self.fastWidgetsFrame,
-                                         text='  pass  ',
+                                         text='  Next  ',
                                          height=2,
-                                         font=('microsoftyahei', 10),
+                                         font=COMMON_FONT,
                                          command=self.eventHosts.passPageEvent)
         self.reviewButton = tkinter.Button(self.fastWidgetsFrame,
-                                           text=' review ',
+                                           text=' Review ',
                                            height=2,
-                                           font=('microsoftyahei', 10),
+                                           font=COMMON_FONT,
                                            command=self.eventHosts.reviewPageEvent)
         # Widget initialize end
         self.applyWidgets()
@@ -55,7 +55,7 @@ class MainWidgets(object):
         self.tks.config(menu=self.mainWindowMenu)
         # Place the menu.
 
-        self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
+        self.fastWidgetsFrame.pack(side='right', fill='both')
         self.displayFrame.pack(side='left', fill='both', expand=True)
         # Place the frame widget.
 
