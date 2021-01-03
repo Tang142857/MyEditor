@@ -30,6 +30,7 @@ class MainWidgets(object):
         fileMenu.add_command(label='Save', command=self.eventHosts.saveFile)
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.eventHosts.copyContent)
+        fileMenu.add_command(label='Directory', command=self.eventHosts.openWorkDirectory)
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end
 
@@ -37,7 +38,7 @@ class MainWidgets(object):
         self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=100, **BORDER_STYLE)
         self.fastWidgetsFrame = tkinter.Frame(self.mainFrame, background='green', **BORDER_STYLE)
         self.fastSettingFrame = tkinter.Frame(self.fastWidgetsFrame, background='blue', height=150, **BORDER_STYLE)
-        self.statusShowFrame = tkinter.Frame(self.tks, background='yellow', height=20, **BORDER_STYLE)
+        self.statusShowFrame = tkinter.Frame(self.tks, background='yellow', height=20)
         # Frame initialize end
 
         self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
@@ -69,7 +70,7 @@ class MainWidgets(object):
         self.reviewButton.pack(side='top', expand=True, fill='x')
         self.fastSettingFrame.pack(fill='both', expand=True)
         self.passButton.pack(side='bottom', expand=True, fill='x')
-        self.statusLabel.pack(fill='x',expand=True)
+        self.statusLabel.pack(anchor='w',fill='x', expand=True)
 
 
 class SetBookPathWindow(object):

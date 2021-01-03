@@ -37,16 +37,24 @@ class Book(object):
 
 
 class BookEditor(object):
-    def makeBookName(self, Paths: str):
+    """
+    The editor of the book object.
+    Using load book to load new book.When the program start running ,it will call the funcion ,too.
+    Using set next/last page to set pages.The counter will get the right page :)
+    """
+    def getPath(self, Paths: str):
         """Make the formated book name."""
         baseFileName = re.split(r'[\\/]', Paths)[-1]  # To get the file name.
-        fileExtendName = '.' + re.split(r'\.', baseFileName)[-1]  # To get the extend name.
-        newFileName = '$' + baseFileName.replace(fileExtendName, '$' + fileExtendName)
-        return Paths.replace(baseFileName, newFileName)
+        # fileExtendName = '.' + re.split(r'\.', baseFileName)[-1]  # To get the extend name.
+        # newFileName = '$' + baseFileName.replace(fileExtendName, '$' + fileExtendName)
+        return Paths.replace(baseFileName, '')
+
+    def getWorkDirectory(self):
+        return self.workDirectory
 
     def loadBook(self, path: str):
         self.originalBookPath = path
-        self.formattedBookPath = self.makeBookName(path)
+        self.workDirectory = self.getPath(path)
         self.pageNumber = 0
         self.data = normalDecoder(path=path)
         # Load book end
@@ -54,14 +62,27 @@ class BookEditor(object):
         MAIN_WINDOW.title('Text Book Reader-' + path)  # Reset the title of the main window.
 
     def setNextPage(self, viewer):
-        viewer.delete(1.0, 'end')  # Delete the last page.
-        viewer.insert('end', self.data.getChapter(self.pageNumber))
         self.pageNumber += 1
+        self.update(viewer=viewer)
+        log(f'Next page ,number {self.pageNumber}')
+
+    def setLastPage(self, viewer):
+        self.pageNumber -= 1
+        self.update(viewer=viewer)
+        log(f'Review page ,number {self.pageNumber}')
+
+    def update(self, viewer):
+        """Update the text with now page number."""
+        viewer.delete(1.0, 'end')  # Clean up the viewer.
+        viewer.insert('end', self.data.getChapter(self.pageNumber))
 
 
 class EventHost(object):
     def __init__(self, editor: BookEditor):
-        self.editor = editor  # 绑定book
+        self.editor = editor  # 绑定editor
+
+    def updateViewer(self):
+        self.editor.update(UI_WIDGETS.contentViewText)
 
     def passPageEvent(self):
         printStatus('pass page event.')
@@ -70,6 +91,7 @@ class EventHost(object):
 
     def reviewPageEvent(self):
         printStatus('review page event.')
+        self.editor.setLastPage(UI_WIDGETS.contentViewText)
         # TODO review page event.
 
     def setBookPath(self):
@@ -97,12 +119,16 @@ class EventHost(object):
         import pyperclip
         nowContent = UI_WIDGETS.contentViewText.get(1.0, 'end')
         pyperclip.copy(nowContent)
+        log('Copy context to clip...')
         del pyperclip  # Clean up the memory
 
     def saveFile(self):
         """Save file to the formatted file."""
-        printStatus('Saving file.')
-        self.book.saveFile()  # Calling book object
+        printStatus('Saving file.')  # TODO save file
+
+    def openWorkDirectory(self):
+        log(f'Going to {self.editor.getWorkDirectory()}')
+        os.popen(f'start {self.editor.getWorkDirectory()}')
 
 
 def printStatus(values, end='\n', head=''):
@@ -119,42 +145,50 @@ def printStatus(values, end='\n', head=''):
 
 
 def windowConfig(event):
-    print(event)
-    UI_WIDGETS.statusLabel.config(text=event.__str__())
+    # print(event)
+    log(event.__str__())
 
 
 def normalDecoder(path: str):
     with open(path, 'r', encoding='utf-8') as files:
         strBook = files.read()
+    log(f'Loading book {path}')
     # Load the book's text end
 
     print('Normal book, without and format.')
     book = Book()  # Initialize the book object.
     chapterSpliter = re.compile(r'第<\d*>章')  # Split the chapter with re.
-    r = chapterSpliter.split(strBook)
+    results = chapterSpliter.split(strBook)
     # Text manage end.
 
-    book.addInfo('name', r[0])
-    del r[0]
-    for chapterText in r:
+    book.addInfo('name', results[0])
+    del results[0]  # Delete the first part of the book(may be it is its description)
+    for chapterText in results:
         book.addChapter(chapterText)
     return book
+
+
+def log(string: str):
+    """Print the status on status label"""
+    UI_WIDGETS.statusLabel.config(text=string)
 
 
 if __name__ == "__main__":
     with open('resource/configure.json', 'r', encoding='utf-8') as configure:
         CONFIGURE = json.loads(configure.read())
-        print(CONFIGURE)
+    print(CONFIGURE)
     # Load configure file end.
 
     MAIN_WINDOW = tkinter.Tk()
     EDITOR = BookEditor()
-    EDITOR.loadBook(CONFIGURE['bookPath'])
     EVENT_HOST = EventHost(EDITOR)
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
     # initialize object end
 
-    printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
+    EDITOR.loadBook(CONFIGURE['bookPath'])  # Preload the default book.
+    EVENT_HOST.updateViewer()  # Update the viewer to display the first page.
+
     MAIN_WINDOW.bind('<Configure>', windowConfig)  # Listening to window config event and log on status label
+
     # UI_WIDGETS.contentViewText.insert('insert', 'hello world')  # Initial text ,will change into an image.
     MAIN_WINDOW.mainloop()  # Calling main loop.
