@@ -37,70 +37,35 @@ class Book(object):
 
 
 class BookEditor(object):
-    def __init__(self, data):
-        self.data = data  # bind the book with editor
+    def makeBookName(self, Paths: str):
+        """Make the formated book name."""
+        baseFileName = re.split(r'[\\/]', Paths)[-1]  # To get the file name.
+        fileExtendName = '.' + re.split(r'\.', baseFileName)[-1]  # To get the extend name.
+        newFileName = '$' + baseFileName.replace(fileExtendName, '$' + fileExtendName)
+        return Paths.replace(baseFileName, newFileName)
+
+    def loadBook(self, path: str):
+        self.originalBookPath = path
+        self.formattedBookPath = self.makeBookName(path)
+        self.pageNumber = 0
+        self.data = normalDecoder(path=path)
+        # Load book end
+
+        MAIN_WINDOW.title('Text Book Reader-' + path)  # Reset the title of the main window.
 
     def setNextPage(self, viewer):
-        pass
-
-
-# class TextBook(object):
-#     def __init__(self, filePaths: str):
-#         """Initialize the book ,when TBC running the can only have one book."""
-#         printStatus('Initialize Text Book ')
-#         self.bookPaths = None
-#         self.bookOriginObject = None
-#         self.formatedBook = None
-
-#         self.setNewBook(filePaths)  # set the path point to the origin book
-
-# def __makeBookName(self, Paths: str):
-#     """Make the formated book name."""
-#     baseFileName = re.split(r'[\\/]', Paths)[-1]
-#     return Paths.replace(baseFileName, '$' + baseFileName)
-
-#     def setNewBook(self, newPaths: str):
-#         printStatus(f'set new book,path: {newPaths}')
-#         try:
-#             self.bookOriginObject.close()  # 关闭上一本书
-#             self.formatedBook.close()
-#         except AttributeError:
-#             pass  # if there happen attribute error ,it maight be initialize the book,pass it.
-#         # finish closing the last book
-
-#         self.bookPaths = newPaths
-#         self.bookOriginObject = open(self.bookPaths, encoding='utf-8', buffering=True)
-#         self.formatedBook = open(self.__makeBookName(newPaths), 'a', encoding='utf-8',
-#                                  buffering=True)  # creat formatted book name
-#         MAIN_WINDOW.title(f'Text Book Reader-{self.bookPaths}')
-
-#     def getNowPath(self):
-#         """
-#         Get now working book path.
-#         """
-#         return self.bookPaths
-
-#     def saveFile(self):
-#         self.formatedBook.flush()  # Write the content in memory to the file.
-
-#     def getNextPage(self):
-#         """Add changed content to the memory and return new content."""
-#         newContent = self.bookOriginObject.read(400)
-
-#         self.formatedBook.write(UI_WIDGETS.contentViewText.get(1.0, 'end'))  # Read the content and add to the memory
-#         UI_WIDGETS.contentViewText.delete(1.0, 'end')  # Delete the remaining text.
-
-#         return newContent
-#         # TODO Getting next page better
+        viewer.delete(1.0, 'end')  # Delete the last page.
+        viewer.insert('end', self.data.getChapter(self.pageNumber))
+        self.pageNumber += 1
 
 
 class EventHost(object):
-    def __init__(self, Book: TextBook):
-        self.book = Book  # 绑定book
+    def __init__(self, editor: BookEditor):
+        self.editor = editor  # 绑定book
 
     def passPageEvent(self):
         printStatus('pass page event.')
-        UI_WIDGETS.contentViewText.insert('insert', self.book.getNextPage())
+        self.editor.setNextPage(UI_WIDGETS.contentViewText)
         # TODO pass age event
 
     def reviewPageEvent(self):
@@ -115,7 +80,7 @@ class EventHost(object):
             newPath = setWidgets.inputWidget.get()
             if os.path.isfile(newPath):
                 printStatus(f'new path {newPath}')
-                self.book.setNewBook(newPath)
+                self.editor.loadBook(newPath)
             else:
                 tkinter.messagebox.showwarning('Warning', 'File can not be read,please check your path.')
             setBookPathWindow.quit()
@@ -153,8 +118,9 @@ def printStatus(values, end='\n', head=''):
     print(f'{head}INFO:{time_string} :: {values}', end=end)
 
 
-def tUpdateXY():
-    printStatus(MAIN_WINDOW.geometry(), head='window geometry:')
+def windowConfig(event):
+    print(event)
+    UI_WIDGETS.statusLabel.config(text=event.__str__())
 
 
 def normalDecoder(path: str):
@@ -182,11 +148,13 @@ if __name__ == "__main__":
     # Load configure file end.
 
     MAIN_WINDOW = tkinter.Tk()
-    BOOK_OBJ = TextBook(CONFIGURE['bookPath'])
-    EVENT_HOST = EventHost(BOOK_OBJ)
+    EDITOR = BookEditor()
+    EDITOR.loadBook(CONFIGURE['bookPath'])
+    EVENT_HOST = EventHost(EDITOR)
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
     # initialize object end
 
     printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
-    UI_WIDGETS.contentViewText.insert('insert', 'hello world')  # Initial text ,will change into an image.
+    MAIN_WINDOW.bind('<Configure>', windowConfig)  # Listening to window config event and log on status label
+    # UI_WIDGETS.contentViewText.insert('insert', 'hello world')  # Initial text ,will change into an image.
     MAIN_WINDOW.mainloop()  # Calling main loop.

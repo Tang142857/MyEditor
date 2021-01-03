@@ -10,6 +10,7 @@ import tkinter
 COMMON_FONT = ('宋体', 12)
 VIEWER_FONT = ('宋体', 10)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
+STATUS_FONT = ('黑体', 9)
 # global variable end
 
 
@@ -20,7 +21,7 @@ class MainWidgets(object):
     def __init__(self, tks: tkinter.Tk, EH):
         self.tks = tks
         self.eventHosts = EH
-        self.tks.geometry('630x306+355+200')
+        self.tks.geometry('700x360+355+200')
         # Set window attribute end
 
         self.mainWindowMenu = tkinter.Menu(self.tks)
@@ -32,9 +33,11 @@ class MainWidgets(object):
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end
 
-        self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100, **BORDER_STYLE)
-        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=1500, height=100, **BORDER_STYLE)
+        self.mainFrame = tkinter.Frame(self.tks)
+        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=100, **BORDER_STYLE)
+        self.fastWidgetsFrame = tkinter.Frame(self.mainFrame, background='green', **BORDER_STYLE)
         self.fastSettingFrame = tkinter.Frame(self.fastWidgetsFrame, background='blue', height=150, **BORDER_STYLE)
+        self.statusShowFrame = tkinter.Frame(self.tks, background='yellow', height=20, **BORDER_STYLE)
         # Frame initialize end
 
         self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
@@ -48,6 +51,7 @@ class MainWidgets(object):
                                            height=2,
                                            font=COMMON_FONT,
                                            command=self.eventHosts.reviewPageEvent)
+        self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT)
         # Widget initialize end
         self.applyWidgets()
 
@@ -55,14 +59,17 @@ class MainWidgets(object):
         self.tks.config(menu=self.mainWindowMenu)
         # Place the menu.
 
+        self.mainFrame.pack(side='top', fill='both', expand=True)
         self.fastWidgetsFrame.pack(side='right', fill='both')
         self.displayFrame.pack(side='left', fill='both', expand=True)
+        self.statusShowFrame.pack(side='bottom', fill='x')
         # Place the frame widget.
 
         self.contentViewText.pack(expand=True, fill='both')
         self.reviewButton.pack(side='top', expand=True, fill='x')
         self.fastSettingFrame.pack(fill='both', expand=True)
         self.passButton.pack(side='bottom', expand=True, fill='x')
+        self.statusLabel.pack(fill='x',expand=True)
 
 
 class SetBookPathWindow(object):
