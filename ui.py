@@ -46,7 +46,7 @@ class MainWidgets(object):
                                          text='  Next  ',
                                          height=2,
                                          font=COMMON_FONT,
-                                         command=self.eventHosts.passPageEvent)
+                                         command=self.eventHosts.nextPageEvent)
         self.reviewButton = tkinter.Button(self.fastWidgetsFrame,
                                            text=' Review ',
                                            height=2,
