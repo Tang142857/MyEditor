@@ -11,9 +11,9 @@ import tkinter
 import tkinter.messagebox
 from time import localtime, strftime, time
 
-import book
-import debug
-import ui
+from tool import book
+from tool import debug
+from tool import ui
 
 
 class BookEditor(object):
@@ -66,18 +66,18 @@ class BookEditor(object):
 class EventHost(object):
     def __init__(self):
         self.editor = None
-    
-    def setEditor(self,editor:BookEditor):
-        self.editor=editor
+
+    def setEditor(self, editor: BookEditor):
+        self.editor = editor
 
     def updateViewer(self):
         self.editor.update(UI_WIDGETS.contentViewText)
 
-    def nextPageEvent(self,event=None):
+    def nextPageEvent(self, event=None):
         # Page change event receive the TK's and ui's signal.
         self.editor.setNextPage(UI_WIDGETS.contentViewText)
 
-    def reviewPageEvent(self,event=None):
+    def reviewPageEvent(self, event=None):
         # Page change event receive the TK's and ui's signal.
         self.editor.setLastPage(UI_WIDGETS.contentViewText)
 
@@ -114,8 +114,13 @@ class EventHost(object):
         printStatus('Saving file.')  # TODO save file
 
     def openWorkDirectory(self):
-        log(f'Going to {self.editor.getWorkDirectory()}')
-        os.popen(f'start {self.editor.getWorkDirectory()}')
+        nowWorkDirectory = self.editor.getWorkDirectory()
+        if ' ' in nowWorkDirectory:
+            log('Open exception.')
+            tkinter.messagebox.showwarning('Path exception', 'Can not open directory with empty char like \\s')
+        else:  # if there some empty chars in path ,can not open the directory with windows explorer
+            log(f'Going to {nowWorkDirectory}')
+            os.popen(f'start {nowWorkDirectory}')
 
 
 def printStatus(values, end='\n', head=''):
@@ -150,7 +155,7 @@ if __name__ == "__main__":
     MAIN_WINDOW = tkinter.Tk()
     EDITOR = BookEditor()
     EVENT_HOST = EventHost()
-    UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)# 加载主窗体UI
+    UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
     # Creating objects end.
     EVENT_HOST.setEditor(EDITOR)
     # initialize object end
@@ -159,7 +164,7 @@ if __name__ == "__main__":
     EVENT_HOST.updateViewer()  # Update the viewer to display the first page.
 
     MAIN_WINDOW.bind('<Configure>', windowConfig)  # Listening to window config event and log on status label
-    MAIN_WINDOW.bind('<Left>',EVENT_HOST.reviewPageEvent)
-    MAIN_WINDOW.bind('<Right>',EVENT_HOST.nextPageEvent)
+    MAIN_WINDOW.bind('<Left>', EVENT_HOST.reviewPageEvent)
+    MAIN_WINDOW.bind('<Right>', EVENT_HOST.nextPageEvent)
 
     MAIN_WINDOW.mainloop()  # Calling main loop.

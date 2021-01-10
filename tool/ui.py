@@ -10,7 +10,7 @@ import tkinter
 COMMON_FONT = ('宋体', 12)
 VIEWER_FONT = ('宋体', 10)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
-STATUS_FONT = ('黑体', 9)
+STATUS_FONT = ('Microsoft YaHei', 9)
 # global variable end
 
 
@@ -52,7 +52,7 @@ class MainWidgets(object):
                                            height=2,
                                            font=COMMON_FONT,
                                            command=self.eventHosts.reviewPageEvent)
-        self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT)
+        self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
         # Widget initialize end
         self.applyWidgets()
 
@@ -70,7 +70,7 @@ class MainWidgets(object):
         self.reviewButton.pack(side='top', expand=True, fill='x')
         self.fastSettingFrame.pack(fill='both', expand=True)
         self.passButton.pack(side='bottom', expand=True, fill='x')
-        self.statusLabel.pack(anchor='w',fill='x', expand=True)
+        self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
 
 class SetBookPathWindow(object):
