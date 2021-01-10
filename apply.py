@@ -64,22 +64,17 @@ class BookEditor(object):
 
 
 class EventHost(object):
-    def __init__(self):
-        self.editor = None
-
-    def setEditor(self, editor: BookEditor):
-        self.editor = editor
 
     def updateViewer(self):
-        self.editor.update(UI_WIDGETS.contentViewText)
+        EDITOR.update(UI_WIDGETS.contentViewText)
 
     def nextPageEvent(self, event=None):
         # Page change event receive the TK's and ui's signal.
-        self.editor.setNextPage(UI_WIDGETS.contentViewText)
+        EDITOR.setNextPage(UI_WIDGETS.contentViewText)
 
     def reviewPageEvent(self, event=None):
         # Page change event receive the TK's and ui's signal.
-        self.editor.setLastPage(UI_WIDGETS.contentViewText)
+        EDITOR.setLastPage(UI_WIDGETS.contentViewText)
 
     def setBookPath(self):
         """
@@ -89,7 +84,7 @@ class EventHost(object):
             newPath = setWidgets.inputWidget.get()
             if os.path.isfile(newPath):
                 printStatus(f'new path {newPath}')
-                self.editor.loadBook(newPath)
+                EDITOR.loadBook(newPath)
             else:
                 tkinter.messagebox.showwarning('Warning', 'File can not be read,please check your path.')
             setBookPathWindow.quit()
@@ -114,7 +109,7 @@ class EventHost(object):
         printStatus('Saving file.')  # TODO save file
 
     def openWorkDirectory(self):
-        nowWorkDirectory = self.editor.getWorkDirectory()
+        nowWorkDirectory = EDITOR.getWorkDirectory()
         if ' ' in nowWorkDirectory:
             log('Open exception.')
             tkinter.messagebox.showwarning('Path exception', 'Can not open directory with empty char like \\s')
@@ -157,7 +152,7 @@ if __name__ == "__main__":
     EVENT_HOST = EventHost()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
     # Creating objects end.
-    EVENT_HOST.setEditor(EDITOR)
+    # EVENT_HOST.setEditor(EDITOR)
     # initialize object end
 
     EDITOR.loadBook(CONFIGURE['bookPath'])  # Preload the default book.
