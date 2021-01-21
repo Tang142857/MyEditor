@@ -7,8 +7,10 @@ All ui objects need father widgets,they will set ui in __init__ function
 """
 import tkinter
 
-COMMON_FONT = ('宋体', 13)
+COMMON_FONT = ('宋体', 12)
 VIEWER_FONT = ('宋体', 10)
+BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
+STATUS_FONT = ('Microsoft YaHei', 9)
 # global variable end
 
 
@@ -19,41 +21,56 @@ class MainWidgets(object):
     def __init__(self, tks: tkinter.Tk, EH):
         self.tks = tks
         self.eventHosts = EH
-        self.tks.geometry('630x306+355+200')
+        self.tks.geometry('700x360+355+200')
         # Set window attribute end
 
         self.mainWindowMenu = tkinter.Menu(self.tks)
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
         fileMenu.add_command(label='Open', command=self.eventHosts.setBookPath)
+        fileMenu.add_command(label='Save', command=self.eventHosts.saveFile)
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.eventHosts.copyContent)
+        fileMenu.add_command(label='Directory', command=self.eventHosts.openWorkDirectory)
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
+        # Menu set end
 
-        self.displayFrame = tkinter.Frame(self.tks, background='red', width=200, height=100)
-        self.fastWidgetsFrame = tkinter.Frame(self.tks, background='green', width=2000, height=100)
+        self.mainFrame = tkinter.Frame(self.tks)
+        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=100, **BORDER_STYLE)
+        self.fastWidgetsFrame = tkinter.Frame(self.mainFrame, background='green', **BORDER_STYLE)
+        self.fastSettingFrame = tkinter.Frame(self.fastWidgetsFrame, background='blue', height=150, **BORDER_STYLE)
+        self.statusShowFrame = tkinter.Frame(self.tks, background='yellow', height=20)
         # Frame initialize end
 
-        # Widget initialize start
         self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
         self.passButton = tkinter.Button(self.fastWidgetsFrame,
-                                         text=' pass ',
+                                         text='  Next  ',
                                          height=2,
-                                         font=('microsoftyahei', 10),
-                                         command=self.eventHosts.passPageEvent)
+                                         font=COMMON_FONT,
+                                         command=self.eventHosts.nextPageEvent)
         self.reviewButton = tkinter.Button(self.fastWidgetsFrame,
-                                           text='review',
+                                           text=' Review ',
                                            height=2,
-                                           font=('microsoftyahei', 10),
+                                           font=COMMON_FONT,
                                            command=self.eventHosts.reviewPageEvent)
+        self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
+        # Widget initialize end
         self.applyWidgets()
 
     def applyWidgets(self):
+        self.tks.config(menu=self.mainWindowMenu)
+        # Place the menu.
+
+        self.mainFrame.pack(side='top', fill='both', expand=True)
+        self.fastWidgetsFrame.pack(side='right', fill='both')
         self.displayFrame.pack(side='left', fill='both', expand=True)
+        self.statusShowFrame.pack(side='bottom', fill='x')
+        # Place the frame widget.
+
         self.contentViewText.pack(expand=True, fill='both')
-        self.fastWidgetsFrame.pack(side='right', fill='both', expand=True)
-        self.passButton.pack(side='bottom', expand=True, fill='x')
         self.reviewButton.pack(side='top', expand=True, fill='x')
-        self.tks.config(menu=self.mainWindowMenu)  # 放置菜单
+        self.fastSettingFrame.pack(fill='both', expand=True)
+        self.passButton.pack(side='bottom', expand=True, fill='x')
+        self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
 
 class SetBookPathWindow(object):

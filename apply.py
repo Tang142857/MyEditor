@@ -3,72 +3,78 @@ TextbookChecker
 @author: Tang142857
 Copyright(c) DFSA Software Develop Center
 """
+
 import json
+import os
+import re
 import tkinter
 import tkinter.messagebox
-import os
 from time import localtime, strftime, time
-import ui
-import debug
+
+from tool import book
+from tool import debug
+from tool import ui
 
 
-class Book(object):
-    def __init__(self, filePaths: str):
-        """
-        Initialize the book ,when TBC running the can only have one book.
-        """
-        printStatus('Initialize Text Book ')
-        self.bookPaths = None
-        self.bookOriginObject = None
-        self.formatedBook = None
-        self.setNewBook(filePaths)  # set the path point to the origin book
+class BookEditor(object):
+    """
+    The editor of the book object.
+    Using load book to load new book.When the program start running ,it will call the funcion ,too.
+    Using set next/last page to set pages.The counter will get the right page :)
+    """
+    def __init__(self):
+        self.data = None
+        self.nowChapterNumber = 0
+        self.nowChapter = []
+        self.workEnvironment = {}
+        # Initialize the attributes
 
-    def setNewBook(self, newPath: str):
-        printStatus(f'set new book,path: {newPath}')
-        try:
-            self.bookOriginObject.close()  # 关闭上一本书
-        except AttributeError:
-            pass  # if there happen attribute error ,it maight be initialize the book,pass it.
-        self.bookPaths = newPath
-        self.bookOriginObject = open(self.bookPaths, encoding='utf-8')
-        MAIN_WINDOW.title(f'Text Book Reader-{self.bookPaths}')
+    def __getPath(self, Paths: str):
+        """Get the file's directory."""
+        baseFileName = re.split(r'[\\/]', Paths)[-1]  # To get the file name.
+        # Replace the origin file with empty char is ok.
+        return Paths.replace(baseFileName, '')
 
-    def getNowPath(self):
-        """
-        Get now working book path.
-        """
-        return self.bookPaths
+    def getWorkDirectory(self):
+        """Accessor of workEnvironment.workDirectory"""
+        return self.workEnvironment['workDirectoryPath']
 
-    def saveFile(self):
-        pass  # TODO Saving function
+    def loadBook(self, path: str):
+        self.workEnvironment['workFilePath'] = path
+        self.workEnvironment['workDirectoryPath'] = self.__getPath(path)
+        self.data = book.decodeBook(path)
+        # Load book end
 
-    def getNextPage(self):
-        newContent = self.bookOriginObject.read(20)
-        return newContent
-        # TODO Getting next page better
+        MAIN_WINDOW.title('Text Book Reader-' + path)  # Reset the title of the main window.
 
-    def getNextChapter(self):
-        pass  # TODO Getting next chapter
+    def setNextPage(self, viewer):
+        self.nowChapterNumber += 1
+        self.update(viewer=viewer)
+        log(f'Next page ,number {self.nowChapterNumber}')
 
+    def setLastPage(self, viewer):
+        self.nowChapterNumber -= 1
+        self.update(viewer=viewer)
+        log(f'Review page ,number {self.nowChapterNumber}')
 
-class TextBook(Book):
-    """Text book is almost the same as book object ,it needn't to laod the ftb file."""
-    def __init__(self, filePath: str):
-        super().__init__(filePath)  # Directly using init function is OK.
+    def update(self, viewer):
+        """Update the text with now page number."""
+        viewer.delete(1.0, 'end')  # Clean up the viewer.
+        viewer.insert('end', self.data.getChapter(self.nowChapterNumber))
 
 
 class EventHost(object):
-    def __init__(self, Book: TextBook):
-        self.book = Book  # 绑定book
 
-    def passPageEvent(self):
-        printStatus('pass page event.')
-        UI_WIDGETS.contentViewText.insert('insert', self.book.getNextPage())
-        # TODO pass age event
+    def updateViewer(self):
+        EDITOR.update(UI_WIDGETS.contentViewText)
 
-    def reviewPageEvent(self):
-        printStatus('review page event.')
-        # TODO review page event.
+    def nextPageEvent(self, event=None):
+        # Page change event receive the TK's and ui's signal.
+        EDITOR.setNextPage(UI_WIDGETS.contentViewText)
+
+    def reviewPageEvent(self, event=None):
+        # Page change event receive the TK's and ui's signal.
+        EDITOR.setLastPage(UI_WIDGETS.contentViewText)
 
     def setBookPath(self):
         """
@@ -78,7 +84,7 @@ class EventHost(object):
             newPath = setWidgets.inputWidget.get()
             if os.path.isfile(newPath):
                 printStatus(f'new path {newPath}')
-                self.book.setNewBook(newPath)
+                EDITOR.loadBook(newPath)
             else:
                 tkinter.messagebox.showwarning('Warning', 'File can not be read,please check your path.')
             setBookPathWindow.quit()
@@ -95,7 +101,21 @@ class EventHost(object):
         import pyperclip
         nowContent = UI_WIDGETS.contentViewText.get(1.0, 'end')
         pyperclip.copy(nowContent)
+        log('Copy context to clip...')
         del pyperclip  # Clean up the memory
+
+    def saveFile(self):
+        """Save file to the formatted file."""
+        printStatus('Saving file.')  # TODO save file
+
+    def openWorkDirectory(self):
+        nowWorkDirectory = EDITOR.getWorkDirectory()
+        if ' ' in nowWorkDirectory:
+            log('Open exception.')
+            tkinter.messagebox.showwarning('Path exception', 'Can not open directory with empty char like \\s')
+        else:  # if there some empty chars in path ,can not open the directory with windows explorer
+            log(f'Going to {nowWorkDirectory}')
+            os.popen(f'start {nowWorkDirectory}')
 
 
 def printStatus(values, end='\n', head=''):
@@ -111,22 +131,35 @@ def printStatus(values, end='\n', head=''):
     print(f'{head}INFO:{time_string} :: {values}', end=end)
 
 
-def tUpdateXY():
-    printStatus(MAIN_WINDOW.geometry(), head='window geometry:')
+def windowConfig(event):
+    # print(event)
+    log(event.__str__())
+
+
+def log(string: str):
+    """Print the status on status label"""
+    UI_WIDGETS.statusLabel.config(text=string)
 
 
 if __name__ == "__main__":
     with open('resource/configure.json', 'r', encoding='utf-8') as configure:
         CONFIGURE = json.loads(configure.read())
-        print(CONFIGURE)
+    print(CONFIGURE)
     # Load configure file end.
 
     MAIN_WINDOW = tkinter.Tk()
-    BOOK_OBJ = TextBook(CONFIGURE['bookPath'])
-    EVENT_HOST = EventHost(BOOK_OBJ)
+    EDITOR = BookEditor()
+    EVENT_HOST = EventHost()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW, EVENT_HOST)  # 加载主窗体UI
+    # Creating objects end.
+    # EVENT_HOST.setEditor(EDITOR)
     # initialize object end
 
-    printStatus(f'window geometry:{MAIN_WINDOW.geometry()}')
-    UI_WIDGETS.contentViewText.insert('insert', 'hello world')
-    MAIN_WINDOW.mainloop()  # 调用主循环
+    EDITOR.loadBook(CONFIGURE['bookPath'])  # Preload the default book.
+    EVENT_HOST.updateViewer()  # Update the viewer to display the first page.
+
+    MAIN_WINDOW.bind('<Configure>', windowConfig)  # Listening to window config event and log on status label
+    MAIN_WINDOW.bind('<Left>', EVENT_HOST.reviewPageEvent)
+    MAIN_WINDOW.bind('<Right>', EVENT_HOST.nextPageEvent)
+
+    MAIN_WINDOW.mainloop()  # Calling main loop.
