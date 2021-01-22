@@ -3,5 +3,6 @@
 *.code-workspace
 Thumbs.db
 *.pyc
+/resource
 
 debug.*
