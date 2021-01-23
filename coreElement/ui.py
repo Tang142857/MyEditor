@@ -6,14 +6,15 @@ Copyright(c) DFSA Software Develop Center
 All ui objects need father widgets,they will set ui in __init__ function
 """
 import tkinter
+import tkinter.scrolledtext
 
 try:
-    from . import mainEvent
+    from coreElement import mainEvent
 except ImportError:  # to test the model only
     import mainEvent
 
 COMMON_FONT = ('宋体', 12)
-VIEWER_FONT = ('宋体', 10)
+VIEWER_FONT = ('consolas', 11)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 # global variable end
@@ -30,13 +31,13 @@ class MainWidgets(object):
         self.saveEvent = mainEvent.SaveEvent()
         self.copyContentEvent = mainEvent.CopyContentEvent()
 
-    def __init__(self, tks: tkinter.Tk):
+    def __init__(self, windows: tkinter.Tk):
         self.__initEvents__()
-        self.tks = tks
-        self.tks.geometry('700x360+355+200')
+        self.windows = windows
+        self.windows.geometry('700x360+355+200')
         # Set window attribute end
 
-        self.mainWindowMenu = tkinter.Menu(self.tks)
+        self.mainWindowMenu = tkinter.Menu(self.windows)
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
         fileMenu.add_command(label='Open', command=self.openEvent.emit)
         fileMenu.add_command(label='Save', command=self.saveEvent.emit)
@@ -46,23 +47,23 @@ class MainWidgets(object):
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end
 
-        self.mainFrame = tkinter.Frame(self.tks)
-        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=100, **BORDER_STYLE)
-        self.statusShowFrame = tkinter.Frame(self.tks, background='yellow', height=20)
+        self.mainFrame = tkinter.Frame(self.windows)
+        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50, **BORDER_STYLE)
+        self.statusShowFrame = tkinter.Frame(self.windows, background='yellow', height=20)
         # Frame initialize end
 
-        self.contentViewText = tkinter.Text(self.displayFrame, font=VIEWER_FONT)
+        self.contentViewText = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
         self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
         # Widget initialize end
         self.applyWidgets()
 
     def applyWidgets(self):
-        self.tks.config(menu=self.mainWindowMenu)
+        self.windows.config(menu=self.mainWindowMenu)
         # Place the menu.
 
+        self.statusShowFrame.pack(side='bottom', fill='x')
         self.mainFrame.pack(side='top', fill='both', expand=True)
         self.displayFrame.pack(side='left', fill='both', expand=True)
-        self.statusShowFrame.pack(side='bottom', fill='x')
         # Place the frame widget.
 
         self.contentViewText.pack(expand=True, fill='both')

@@ -36,7 +36,7 @@ class BaseEvent(object):
 
     def emit(self, event=None):
         """Emit the event."""
-        self.decider(event=event)
+        self.decider(event)
 
 
 class OpenEvent(BaseEvent):
@@ -57,6 +57,31 @@ class OpenWorkDirEvent(BaseEvent):
 class CopyContentEvent(BaseEvent):
     def __init__(self):
         super().__init__()
+
+
+class EditEvent(BaseEvent):
+    def __init__(self, text):
+        super().__init__()
+        self.text = text  # send to editor.check
+
+    def _do(self):
+        """Override do to send text for editor.check"""
+        print('Editor do...')
+        for func in self.callList:
+            func(self.text)
+
+
+class EditorLogEvent(BaseEvent):
+    """Override the BE to send log to status label"""
+    def __init__(self):
+        super().__init__()
+
+    def _do(self, message):
+        for func in self.callList:
+            func(message)
+
+    def decider(self, message):
+        self._do(message)
 
 
 class ExampleEvent(BaseEvent):
