@@ -25,9 +25,34 @@ class BaseEvent(object):
         else:
             raise ConnectException(str(func) + ' can not be called.')
 
-    def emit(self):
+    def _do(self):
+        """Call all the connected function."""
         for func in self.callList:
             func()  # work through the call list and call functions
+
+    def decider(self, event=None):
+        """Decide whether do the action or not,you may override the function"""
+        self._do()
+
+    def emit(self, event=None):
+        """Emit the event."""
+        self.decider(event=event)
+
+
+class ExampleEvent(BaseEvent):
+    """Example class to test."""
+    def __init__(self):
+        super().__init__()
+        self.lock = True
+
+    def decider(self, event=None):
+        if self.lock:
+            self._do()
+        else:
+            return
+
+    def lockMe(self):
+        self.lock = False
 
 
 def test_fun():
@@ -35,7 +60,9 @@ def test_fun():
 
 
 if __name__ == "__main__":
-    event = BaseEvent()
+    event = ExampleEvent()
     event.connect(test_fun)
     event.connect(test_fun)
+    event.emit()
+    event.lockMe()
     event.emit()
