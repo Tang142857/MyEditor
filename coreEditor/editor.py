@@ -10,9 +10,25 @@ Copyright(c) DFSA Software Develop Center
 from coreElement.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
+KEY_CHAR = ['!', '@', '#', '$', '%', '^', '&', '*']
 
 
-def check(text):
+def setTags(text):
+    """Config tags for color the word first."""
+    text.tag_config('say', foreground='green')
+    text.tag_config('warning', foreground='red', background='yellow')
+
+
+def check(text, event):
     """Main function to call."""
-    logEvent.emit('Checking...')
-    content = text.get(1.0, 'end')
+    logEvent.emit(f'Checking {event.__str__()}...')
+
+    content = text.get('0.0', 'end')
+    text.delete('0.0', 'end')  # clean up the space
+    for char in content[:-1]:  # needn't the last \n
+        if char in KEY_CHAR:
+            text.insert('insert', char, 'warning')  # 特殊符号警告
+        else:
+            text.insert('insert', char)  # FIXME wrong insert position
+
+    logEvent.emit('Finish checking...')

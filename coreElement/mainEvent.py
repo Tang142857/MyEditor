@@ -64,11 +64,13 @@ class EditEvent(BaseEvent):
         super().__init__()
         self.text = text  # send to editor.check
 
-    def _do(self):
+    def _do(self,event):
         """Override do to send text for editor.check"""
-        print('Editor do...')
         for func in self.callList:
-            func(self.text)
+            func(self.text,event)
+    
+    def decider(self,event=None):
+        self._do(event)
 
 
 class EditorLogEvent(BaseEvent):

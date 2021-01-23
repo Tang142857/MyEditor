@@ -14,7 +14,7 @@ from coreEditor import editor
 from coreElement import ui
 from coreElement.mainEvent import EditEvent
 
-sys.path.append(os.getcwd())
+sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 
 
 def openFile():
@@ -31,7 +31,7 @@ def save():
 
 def copyContent():
     log('copy content...')
-    content = UI_WIDGETS.contentViewText.get(1.0, 'end')
+    content = UI_WIDGETS.contentViewText.get('0.0', 'end')
     import pyperclip
     pyperclip.copy(content)
     del pyperclip
@@ -44,6 +44,8 @@ def log(message):
 if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
+    editor.setTags(UI_WIDGETS.contentViewText)  # config tags for color
+    UI_WIDGETS.contentViewText.insert('insert', 'Hello World', 'say')
 
     # Some event emitted by MAIN_WINDOW should create for extend(include editor)
     editEvent = EditEvent(UI_WIDGETS.contentViewText)
