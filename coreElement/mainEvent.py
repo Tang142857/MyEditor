@@ -39,6 +39,26 @@ class BaseEvent(object):
         self.decider(event=event)
 
 
+class OpenEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+
+class SaveEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+
+class OpenWorkDirEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+
+class CopyContentEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+
 class ExampleEvent(BaseEvent):
     """Example class to test."""
     def __init__(self):
