@@ -73,27 +73,27 @@ class MainWidgets(object):
         self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
 
-class SetBookPathWindow(object):
-    """
-    set or checkout to another book function's ui object
-    """
-    def __init__(self, toplevels, setFunction):
-        self.toplevels = toplevels
-        self.toplevels.title('Set book path')
-        self.chooseFrame = tkinter.Frame(toplevels)
-        # set up window and frame end
+# class SetBookPathWindow(object):
+#     """
+#     set or checkout to another book function's ui object
+#     """
+#     def __init__(self, toplevels, setFunction):
+#         self.toplevels = toplevels
+#         self.toplevels.title('Set book path')
+#         self.chooseFrame = tkinter.Frame(toplevels)
+#         # set up window and frame end
 
-        self.inputWidget = tkinter.Entry(toplevels, font=COMMON_FONT)
-        self.cancelButton = tkinter.Button(self.chooseFrame, text='cancel', command=self.cancelQuit, font=COMMON_FONT)
-        self.yesButton = tkinter.Button(self.chooseFrame, text='set', command=setFunction, font=COMMON_FONT)
-        self.applyWidgets()
+#         self.inputWidget = tkinter.Entry(toplevels, font=COMMON_FONT)
+#         self.cancelButton = tkinter.Button(self.chooseFrame, text='cancel', command=self.cancelQuit, font=COMMON_FONT)
+#         self.yesButton = tkinter.Button(self.chooseFrame, text='set', command=setFunction, font=COMMON_FONT)
+#         self.applyWidgets()
 
-    def cancelQuit(self):
-        self.toplevels.quit()
-        self.toplevels.destroy()  # toplevel的玄学东西，quit之后还要加上destroy
+#     def cancelQuit(self):
+#         self.toplevels.quit()
+#         self.toplevels.destroy()  # toplevel的玄学东西，quit之后还要加上destroy
 
-    def applyWidgets(self):
-        self.inputWidget.pack(expand=True, fill='both')
-        self.chooseFrame.pack(expand=True, fill='x')
-        self.yesButton.pack(expand=True, side='left', fill='y')
-        self.cancelButton.pack(expand=True, side='right', fill='y')
+#     def applyWidgets(self):
+#         self.inputWidget.pack(expand=True, fill='both')
+#         self.chooseFrame.pack(expand=True, fill='x')
+#         self.yesButton.pack(expand=True, side='left', fill='y')
+#         self.cancelButton.pack(expand=True, side='right', fill='y')

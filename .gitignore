@@ -4,5 +4,5 @@
 Thumbs.db
 *.pyc
 /resource
-
+/coreElement/__pycache__
 debug.*
