@@ -17,16 +17,19 @@ from coreElement.mainEvent import EditEvent
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 
+RUN_STATUS = {'isOpened': False, 'isSaved': False}
+
 
 def openFile(path=None):
     log('open file emit')
     if (path is None) or (not os.path.isfile(path)):
         path = tkinter.filedialog.askopenfilename(title='Open')
+    # ask path end
     log(f'Opening file {path}')
 
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
-
+    # read file and write them into text
     UI_WIDGETS.contentViewText.insert('1.0', content)
 
 

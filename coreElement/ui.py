@@ -38,12 +38,15 @@ class MainWidgets(object):
         # Set window attribute end
 
         self.mainWindowMenu = tkinter.Menu(self.windows)
+
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
         fileMenu.add_command(label='Open', command=self.openEvent.emit)
         fileMenu.add_command(label='Save', command=self.saveEvent.emit)
+        fileMenu.add_command(label='Close file')
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
         fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
+
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end
 
