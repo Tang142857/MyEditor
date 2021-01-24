@@ -50,5 +50,4 @@ def check(text, event):
                 text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
                 text.insert(f'{index+1}.{start}', target, 'key')
 
-    # text.mark_set('insert', f'{insertRow}.{insertColumn}')
     logEvent.emit(f'Finish checking, back insert{insertRow}.{insertColumn}...')

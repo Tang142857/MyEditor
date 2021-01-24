@@ -54,7 +54,7 @@ class MainWidgets(object):
 
         self.mainFrame = tkinter.Frame(self.windows)
         self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50, **BORDER_STYLE)
-        self.statusShowFrame = tkinter.Frame(self.windows, background='yellow', height=20)
+        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=20)
         # Frame initialize end
 
         self.contentViewText = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
@@ -87,31 +87,8 @@ class MainWidgets(object):
         self.contentViewText.pack(expand=True, fill='both')
 
 
-# class SetBookPathWindow(object):
-#     """
-#     set or checkout to another book function's ui object
-#     """
-#     def __init__(self, toplevels, setFunction):
-#         self.toplevels = toplevels
-#         self.toplevels.title('Set book path')
-#         self.chooseFrame = tkinter.Frame(toplevels)
-#         # set up window and frame end
-
-#         self.inputWidget = tkinter.Entry(toplevels, font=COMMON_FONT)
-#         self.cancelButton = tkinter.Button(self.chooseFrame, text='cancel', command=self.cancelQuit, font=COMMON_FONT)
-#         self.yesButton = tkinter.Button(self.chooseFrame, text='set', command=setFunction, font=COMMON_FONT)
-#         self.applyWidgets()
-
-#     def cancelQuit(self):
-#         self.toplevels.quit()
-#         self.toplevels.destroy()  # toplevel的玄学东西，quit之后还要加上destroy
-
-#     def applyWidgets(self):
-#         self.inputWidget.pack(expand=True, fill='both')
-#         self.chooseFrame.pack(expand=True, fill='x')
-#         self.yesButton.pack(expand=True, side='left', fill='y')
-#         self.cancelButton.pack(expand=True, side='right', fill='y')
 if __name__ == '__main__':
     testWindow = tkinter.Tk()
     ui = MainWidgets(testWindow)
+    ui.fillEmptyText('Test')
     testWindow.mainloop()

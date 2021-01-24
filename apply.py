@@ -14,23 +14,28 @@ import tkinter.filedialog
 from coreEditor import editor
 from coreElement import ui
 from coreElement.mainEvent import EditEvent
+import exceptions
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 
 RUN_STATUS = {'isOpened': False, 'isSaved': False, 'openedFilePath': ''}
 
 
-class CloseFileException(BaseException):
-    def __init__(self, message):
-        super().__init__()
-        self.message = message
+class TextFile(object):
+    """文本文件类，用于打开，保存文件，以及储存文件状态（替代RUN_STATUS）和更多文件服务"""
+    def __init__(self,isNew=True,path=None):
+        """
+        初始化文件
+        isNew: 是否创建新文件，默认创建新文件
+        path: 若读取文件，需要传入path，创建的新文件没有path（None），保存时报错
+        """
 
 
 def openFile(path=None):
     """Clean up the text and insert new file"""
     try:
         closeFile()  # close the last file
-    except CloseFileException:
+    except exceptions.CloseFileException:
         pass
     finally:
         UI_WIDGETS.relieveEmptyText()  # relieve the content viewer
@@ -48,13 +53,14 @@ def openFile(path=None):
     RUN_STATUS['isOpened'] = True
     RUN_STATUS['openedFilePath'] = path
     # save file options
+    editEvent.emit()
     log(f'Opened file {path} successfully')
 
 
 def closeFile():
     """Clean up the window"""
     if RUN_STATUS['isOpened'] is False:
-        raise CloseFileException('Have not opened a file.')
+        raise exceptions.CloseFileException('Have not opened a file.')
     else:
         UI_WIDGETS.contentViewText.delete('1.0', 'end')
         UI_WIDGETS.fillEmptyText()
