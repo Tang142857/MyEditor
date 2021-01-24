@@ -14,13 +14,46 @@ from coreElement.mainEvent import EditorLogEvent
 logEvent = EditorLogEvent()
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
 KEY_WORDS = ['main', 'if', '小说', '·', '~']
+SPECIAL_RANGE = [("'", "'"), ('"', '"'), ("“", "”"), ("(", ")")]
 
 
 def setTags(text):
     """Config tags for color the word first."""
     text.tag_config('say', foreground='green')
+    text.tag_config('bracket', foreground='blue', background='red')
     text.tag_config('key', foreground='orange', underline=True)
     text.tag_config('warning', foreground='red', background='yellow')
+
+
+def __findArea(string: str, start='“', end='”'):  # FIXME 多重括号！！！
+    """在字符串中匹配start和end包围起来的内容（括号，人物对话之类的）"""
+    indexList = []  # cell [start index,end index]
+    inRange = False
+    cell = [0, 0]
+
+    for index, char in enumerate(string):
+        if char == start and (not inRange):  # enter range
+            inRange = True
+            cell[0] = index
+        elif char == end:
+            if inRange:  # 只有前符号的（多半有问题）
+                cell[1] = index
+                indexList.append(cell)
+                cell = [0, 0]
+                inRange = False
+            else:
+                cell[0], cell[1] = 0, index
+                indexList.append(cell)
+                cell = [0, 0]
+                inRange = False
+        else:
+            pass
+
+    if inRange:  # 超出去了
+        cell[1] = len(string) - 1
+        indexList.append(cell)
+
+    return indexList
 
 
 def check(text, event):
@@ -50,4 +83,12 @@ def check(text, event):
                 text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
                 text.insert(f'{index+1}.{start}', target, 'key')
 
-    logEvent.emit(f'Finish checking, back insert{insertRow}.{insertColumn}...')
+        # 括号
+        for cell in __findArea(row, '(', ')'):
+            start, end = cell[0], cell[1]
+            target = text.get(f'{index+1}.{start}', f'{index+1}.{end+1}')
+            text.delete(f'{index+1}.{start}', f'{index+1}.{end+1}')
+            text.insert(f'{index+1}.{start}', target, 'bracket')
+
+    text.mark_set('insert', f'{insertRow}.{insertColumn}')  # 鼠标放回去
+    logEvent.emit(f'Finish checking ,insert position {insertRow}.{insertColumn}...')
