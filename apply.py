@@ -9,6 +9,7 @@ Copyright(c) DFSA Software Develop Center
 import os
 import sys
 import tkinter
+import tkinter.filedialog
 
 from coreEditor import editor
 from coreElement import ui
@@ -17,8 +18,16 @@ from coreElement.mainEvent import EditEvent
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 
 
-def openFile():
+def openFile(path=None):
     log('open file emit')
+    if (path is None) or (not os.path.isfile(path)):
+        path = tkinter.filedialog.askopenfilename(title='Open')
+    log(f'Opening file {path}')
+
+    with open(path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    UI_WIDGETS.contentViewText.insert('1.0', content)
 
 
 def openWorkDir():
@@ -46,6 +55,7 @@ if __name__ == '__main__':
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
     editor.setTags(UI_WIDGETS.contentViewText)  # config tags for color
     UI_WIDGETS.contentViewText.insert('insert', 'Hello World', 'say')
+    UI_WIDGETS.contentViewText.delete('1.1', '1.1')
 
     # Some event emitted by MAIN_WINDOW should create for extend(include editor)
     editEvent = EditEvent(UI_WIDGETS.contentViewText)
