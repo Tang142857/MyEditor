@@ -13,7 +13,7 @@ from coreElement.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
-KEY_WORDS = ['main']
+KEY_WORDS = ['main', 'if', '小说', '·', '~']
 
 
 def setTags(text):
@@ -50,5 +50,5 @@ def check(text, event):
                 text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
                 text.insert(f'{index+1}.{start}', target, 'key')
 
-    text.mark_set('insert', f'{insertRow}.{insertColumn}')
+    # text.mark_set('insert', f'{insertRow}.{insertColumn}')
     logEvent.emit(f'Finish checking, back insert{insertRow}.{insertColumn}...')

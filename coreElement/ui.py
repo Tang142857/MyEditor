@@ -17,6 +17,7 @@ COMMON_FONT = ('宋体', 12)
 VIEWER_FONT = ('consolas', 11)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
+FILL_TEXT_FONT = ('Microsoft YaHei', 50)
 # global variable end
 
 
@@ -30,6 +31,7 @@ class MainWidgets(object):
         self.openEvent = mainEvent.OpenEvent()
         self.saveEvent = mainEvent.SaveEvent()
         self.copyContentEvent = mainEvent.CopyContentEvent()
+        self.closeFileEvent = mainEvent.CloseFileEvent()
 
     def __init__(self, windows: tkinter.Tk):
         self.__initEvents__()
@@ -42,7 +44,7 @@ class MainWidgets(object):
         fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
         fileMenu.add_command(label='Open', command=self.openEvent.emit)
         fileMenu.add_command(label='Save', command=self.saveEvent.emit)
-        fileMenu.add_command(label='Close file')
+        fileMenu.add_command(label='Close file', command=self.closeFileEvent.emit)
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
         fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
@@ -57,6 +59,7 @@ class MainWidgets(object):
 
         self.contentViewText = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
         self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
+        self.fillEmptyLabel = tkinter.Label(self.displayFrame, font=FILL_TEXT_FONT)  # A label to fill text
         # Widget initialize end
         self.applyWidgets()
 
@@ -71,6 +74,17 @@ class MainWidgets(object):
 
         self.contentViewText.pack(expand=True, fill='both')
         self.statusLabel.pack(anchor='w', fill='x', expand=True)
+
+    def fillEmptyText(self, string='No File'):
+        """Fill the content view text with a big label with string."""
+        self.contentViewText.pack_forget()  # 先把原来的忘掉
+        self.fillEmptyLabel.config(text=string)
+        self.fillEmptyLabel.pack(fill='both', expand=True)  # 把填充物放上去
+
+    def relieveEmptyText(self):
+        """Delete the label that fill the empty text"""
+        self.fillEmptyLabel.pack_forget()  # 忘记填充物
+        self.contentViewText.pack(expand=True, fill='both')
 
 
 # class SetBookPathWindow(object):

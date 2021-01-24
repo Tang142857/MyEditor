@@ -74,7 +74,8 @@ class EditEvent(BaseEvent):
 
 
 class CloseFileEvent(BaseEvent):
-    pass
+    def __init__(self):
+        super().__init__()
 
 
 class EditorLogEvent(BaseEvent):
