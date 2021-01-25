@@ -83,8 +83,8 @@ def check(text, event):
                 text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
                 text.insert(f'{index+1}.{start}', target, 'key')
 
-        # 括号 FIXME 无法归还修正的mark
-        for targetMark in SPECIAL_RANGE:
+        # 括号
+        for targetMark in SPECIAL_RANGE:  # FIXME 无法归还修正的mark
             for cell in __findArea(row, targetMark[0], targetMark[1]):
                 start, end = cell[0], cell[1]
                 target = text.get(f'{index+1}.{start}', f'{index+1}.{end+1}')
