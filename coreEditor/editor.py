@@ -68,6 +68,9 @@ def check(text, event):
     logEvent.emit('Scanning the file row by row...')
 
     for rowIndex, strRow in enumerate(rows):  # here is rows list
+        # update the row first to clean the outdate marks off
+        text.delete(f'{rowIndex+1}.0', f'{rowIndex+1}.{len(strRow)}')
+        text.insert(f'{rowIndex+1}.0', strRow)
 
         # 特殊字符
         for target in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
@@ -88,7 +91,7 @@ def check(text, event):
                 text.insert(f'{rowIndex+1}.{start}', target, 'key')
 
         # 括号
-        for targetMark in SPECIAL_RANGE:  # FIXME 无法归还修正的mark
+        for targetMark in SPECIAL_RANGE:
             for area in __findArea(strRow, targetMark[0], targetMark[1]):
                 start, end = area[0], area[1]
                 target = text.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
