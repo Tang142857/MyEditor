@@ -42,6 +42,7 @@ class TextFile(object):
             log('Create empty file.')
 
         UI_WIDGETS.relieveEmptyText()
+        MAIN_WINDOW.title(f'{ui.WINDOWS_CONFIG["init_title"]} - {self.path}')
 
     def __loadFile(self):
         """Mark sure file is real,and open it."""
@@ -82,7 +83,9 @@ class TextFile(object):
             if ans: self.save(UI_WIDGETS.contentViewText)  # save file
         del self.bitFile, self.strFile, self.path, self.isSave, self.isOpened
         UI_WIDGETS.contentViewText.delete('1.0', 'end')
+
         UI_WIDGETS.fillEmptyText()
+        MAIN_WINDOW.title(ui.WINDOWS_CONFIG['init_title'])
 
 
 def openFile(path=None):
