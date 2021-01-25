@@ -30,7 +30,7 @@ class TextFile(object):
         """
         self.path = path
         self.isOpened = True
-        self.isSave = True
+        self.isSave = False
 
         self.bitFile = None
         self.strFile = None
@@ -74,13 +74,17 @@ class TextFile(object):
         self.isSave = True
 
     def edit(self, text, event):
+        """Options here only for recieve the event from editor.editEvent ,and not to cause exceptions"""
         self.isSave = False
+
+        log('Edit file from textfile.edit')
 
     def close(self):
         """Make sure file is saved"""
         if self.isSave is False:
             ans = tkinter.messagebox.askyesno('Save', 'File has not saved,save it right now?\n文件未保存，保存？')
-            if ans: self.save(UI_WIDGETS.contentViewText)  # save file
+            if ans: self.save()  # save file
+
         del self.bitFile, self.strFile, self.path, self.isSave, self.isOpened
         UI_WIDGETS.contentViewText.delete('1.0', 'end')
 
@@ -152,6 +156,7 @@ if __name__ == '__main__':
     UI_WIDGETS.copyContentEvent.connect(copyContent)
     UI_WIDGETS.closeFileEvent.connect(closeFile)
     # UI connect end
+    editEvent.connect(FILE.edit)
     editEvent.connect(editor.check)
     # extend connect with MAIN_WINDOW
     editor.logEvent.connect(log)
