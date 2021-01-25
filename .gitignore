@@ -1,8 +1,12 @@
 /.vscode
+
 /__pycache__
+/coreElement/__pycache__
+/coreEditor/__pycache__
+
 *.code-workspace
 Thumbs.db
 *.pyc
 /resource
-/coreElement/__pycache__
+
 debug.*

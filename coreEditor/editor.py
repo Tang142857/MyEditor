@@ -13,8 +13,8 @@ from coreElement.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
-KEY_WORDS = ['main', 'if', '小说', '·', '~']
-SPECIAL_RANGE = [("'", "'"), ('"', '"'), ("“", "”"), ("(", ")")]
+KEY_WORDS = ['main', 'if', '小说', '·', '：', ':']
+SPECIAL_RANGE = [("'", "'"), ('"', '"'), ("“", "”"), ("(", ")"), ('‘', '’')]
 
 
 def setTags(text):
@@ -83,12 +83,13 @@ def check(text, event):
                 text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
                 text.insert(f'{index+1}.{start}', target, 'key')
 
-        # 括号
-        for cell in __findArea(row, '(', ')'):
-            start, end = cell[0], cell[1]
-            target = text.get(f'{index+1}.{start}', f'{index+1}.{end+1}')
-            text.delete(f'{index+1}.{start}', f'{index+1}.{end+1}')
-            text.insert(f'{index+1}.{start}', target, 'bracket')
+        # 括号 FIXME 无法归还修正的mark
+        for targetMark in SPECIAL_RANGE:
+            for cell in __findArea(row, targetMark[0], targetMark[1]):
+                start, end = cell[0], cell[1]
+                target = text.get(f'{index+1}.{start}', f'{index+1}.{end+1}')
+                text.delete(f'{index+1}.{start}', f'{index+1}.{end+1}')
+                text.insert(f'{index+1}.{start}', target, 'bracket')
 
     text.mark_set('insert', f'{insertRow}.{insertColumn}')  # 鼠标放回去
     logEvent.emit(f'Finish checking ,insert position {insertRow}.{insertColumn}...')

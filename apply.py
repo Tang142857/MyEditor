@@ -44,6 +44,12 @@ class TextFile(object):
         UI_WIDGETS.relieveEmptyText()
 
     def __loadFile(self):
+        """Mark sure file is real,and open it."""
+        if (self.path is None) or (not os.path.isfile(self.path)):
+            self.path = tkinter.filedialog.askopenfilename(title='Open new file')
+            if self.path == '':
+                raise exceptions.OpenFileException('User has not choose a file.')  # user choose 'cancl'
+
         with open(self.path, 'rb') as f:
             self.bitFile = f.read()  # open with bin for encode after load
 
@@ -56,7 +62,6 @@ class TextFile(object):
     def save(self, encoding='utf-8'):
         """Save the file with path"""
         content = UI_WIDGETS.contentViewText.get('1.0', 'end')[:-1]  # need not the last \n
-        print([content])
 
         if self.path == 'Untitle.txt':
             self.path = tkinter.filedialog.asksaveasfilename(title='Save new file')
@@ -86,10 +91,6 @@ def openFile(path=None):
         closeFile()
     except exceptions.CloseFileException as msg:
         log(msg.__str__())  # 报错多半是首次打开，没文件可以关
-
-    if (path is None) or (not os.path.isfile(path)):
-        path = tkinter.filedialog.askopenfilename(title='Open new file')
-        if path == '': return  # user choose 'cancl'
 
     global FILE  # 向file指针上面挂，不然函数返回就没了
     FILE = TextFile(False, path)
