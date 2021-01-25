@@ -12,7 +12,7 @@ import re
 from coreElement.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
-SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
+SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
 KEY_WORDS = ['main', 'if', '小说', '·', '：', ':']
 SPECIAL_RANGE = [("'", "'"), ('"', '"'), ("“", "”"), ("(", ")"), ('‘', '’')]
 
@@ -67,29 +67,33 @@ def check(text, event):
 
     logEvent.emit('Scanning the file row by row...')
 
-    for index, row in enumerate(rows):  # here is rows list
+    for rowIndex, strRow in enumerate(rows):  # here is rows list
 
         # 特殊字符
         for target in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
-            starts = [found.start() for found in re.finditer(target, row)]  # get chars index
-            for start in starts:
-                text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)-1}')  # 注意，特殊字符偏移量不同
-                text.insert(f'{index+1}.{start}', target.replace('\\', ''), 'warning')  # 注意，特殊字符去掉转义，give it back
+            finder = re.compile(target)
+            starts = [found.start() for found in finder.finditer(strRow)]
+            matches = [found.group() for found in finder.finditer(strRow)]
+
+            for colIndex, start in enumerate(starts):
+                text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{start+len(target)-1}')  # 注意，特殊字符偏移量不同
+                text.insert(f'{rowIndex+1}.{start}', matches[colIndex], 'warning')  # 注意，特殊字符去掉转义，give it back
 
         # 自定义关键字
         for target in KEY_WORDS:  # 每一行逐个查找KEY是否存在
-            starts = [found.start() for found in re.finditer(target, row)]  # get chars index
+            starts = [found.start() for found in re.finditer(target, strRow)]  # get chars index
+
             for start in starts:
-                text.delete(f'{index+1}.{start}', f'{index+1}.{start+len(target)}')
-                text.insert(f'{index+1}.{start}', target, 'key')
+                text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{start+len(target)}')
+                text.insert(f'{rowIndex+1}.{start}', target, 'key')
 
         # 括号
         for targetMark in SPECIAL_RANGE:  # FIXME 无法归还修正的mark
-            for cell in __findArea(row, targetMark[0], targetMark[1]):
-                start, end = cell[0], cell[1]
-                target = text.get(f'{index+1}.{start}', f'{index+1}.{end+1}')
-                text.delete(f'{index+1}.{start}', f'{index+1}.{end+1}')
-                text.insert(f'{index+1}.{start}', target, 'bracket')
+            for area in __findArea(strRow, targetMark[0], targetMark[1]):
+                start, end = area[0], area[1]
+                target = text.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                text.insert(f'{rowIndex+1}.{start}', target, 'bracket')
 
     text.mark_set('insert', f'{insertRow}.{insertColumn}')  # 鼠标放回去
     logEvent.emit(f'Finish checking ,insert position {insertRow}.{insertColumn}...')
