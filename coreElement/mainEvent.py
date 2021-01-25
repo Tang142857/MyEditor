@@ -39,6 +39,38 @@ class BaseEvent(object):
         self.decider(event)
 
 
+class BaseEventWithArgument(BaseEvent):
+    """Base event"""
+    def __init__(self):
+        self.callList = []
+        self.arguments = {}
+
+    def addArgument(self, name, value):
+        """Add new argument to argument dictionary."""
+        self.arguments[name] = value
+
+    def connect(self, func):
+        """Connect the function to event."""
+        if callable(func):
+            self.callList.append(func)
+        else:
+            raise ConnectException(str(func) + ' can not be called.')
+
+    def _do(self):
+        """Call all the connected function."""
+        for func in self.callList:
+            func(**self.arguments)  # work through the call list and call functions
+
+    def decider(self):
+        """Decide whether do the action or not,you may override the function"""
+        self._do()
+
+    def emit(self, event=None):
+        """Emit the event."""
+        self.addArgument('event', event)
+        self.decider()
+
+
 class OpenEvent(BaseEvent):
     def __init__(self):
         super().__init__()
@@ -59,18 +91,9 @@ class CopyContentEvent(BaseEvent):
         super().__init__()
 
 
-class EditEvent(BaseEvent):
-    def __init__(self, text):
+class EditEvent(BaseEventWithArgument):
+    def __init__(self):
         super().__init__()
-        self.text = text  # send to editor.check
-
-    def _do(self, event):
-        """Override do to send text for editor.check"""
-        for func in self.callList:
-            func(self.text, event)
-
-    def decider(self, event=None):
-        self._do(event)
 
 
 class CloseFileEvent(BaseEvent):

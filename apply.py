@@ -73,8 +73,8 @@ class TextFile(object):
             self.strFile = content  # update memory
         self.isSave = True
 
-    def edit(self, text, event):
-        """Options here only for recieve the event from editor.editEvent ,and not to cause exceptions"""
+    def edit(self, **args):
+        """Options here only for receive the event from editor.editEvent ,and not to cause exceptions"""
         self.isSave = False
 
         log('Edit file from textfile.edit')
@@ -148,7 +148,9 @@ if __name__ == '__main__':
     FILE = TextFile()  # point to text file in order not to let it deleted
 
     # Some event emitted by MAIN_WINDOW should create for extend(include editor)
-    editEvent = EditEvent(UI_WIDGETS.contentViewText)
+    editEvent = EditEvent()
+
+    editEvent.addArgument('text', UI_WIDGETS.contentViewText)
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
