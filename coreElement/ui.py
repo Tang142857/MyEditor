@@ -18,6 +18,8 @@ VIEWER_FONT = ('consolas', 11)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 FILL_TEXT_FONT = ('Microsoft YaHei', 50)
+
+WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'Text Book Checker'}
 # global variable end
 
 
@@ -36,7 +38,8 @@ class MainWidgets(object):
     def __init__(self, windows: tkinter.Tk):
         self.__initEvents__()
         self.windows = windows
-        self.windows.geometry('700x360+355+200')
+        self.windows.geometry(WINDOWS_CONFIG['position'])
+        self.windows.title(WINDOWS_CONFIG['init_title'])
         # Set window attribute end
 
         self.mainWindowMenu = tkinter.Menu(self.windows)

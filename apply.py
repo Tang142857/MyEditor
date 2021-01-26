@@ -30,7 +30,7 @@ class TextFile(object):
         """
         self.path = path
         self.isOpened = True
-        self.isSave = True
+        self.isSave = False
 
         self.bitFile = None
         self.strFile = None
@@ -42,6 +42,7 @@ class TextFile(object):
             log('Create empty file.')
 
         UI_WIDGETS.relieveEmptyText()
+        MAIN_WINDOW.title(f'{ui.WINDOWS_CONFIG["init_title"]} - {self.path}')
 
     def __loadFile(self):
         """Mark sure file is real,and open it."""
@@ -72,17 +73,23 @@ class TextFile(object):
             self.strFile = content  # update memory
         self.isSave = True
 
-    def edit(self, text, event):
+    def edit(self, **args):
+        """Options here only for receive the event from editor.editEvent ,and not to cause exceptions"""
         self.isSave = False
+
+        log('Edit file from textfile.edit')
 
     def close(self):
         """Make sure file is saved"""
         if self.isSave is False:
             ans = tkinter.messagebox.askyesno('Save', 'File has not saved,save it right now?\n文件未保存，保存？')
-            if ans: self.save(UI_WIDGETS.contentViewText)  # save file
+            if ans: self.save()  # save file
+
         del self.bitFile, self.strFile, self.path, self.isSave, self.isOpened
         UI_WIDGETS.contentViewText.delete('1.0', 'end')
+
         UI_WIDGETS.fillEmptyText()
+        MAIN_WINDOW.title(ui.WINDOWS_CONFIG['init_title'])
 
 
 def openFile(path=None):
@@ -141,7 +148,9 @@ if __name__ == '__main__':
     FILE = TextFile()  # point to text file in order not to let it deleted
 
     # Some event emitted by MAIN_WINDOW should create for extend(include editor)
-    editEvent = EditEvent(UI_WIDGETS.contentViewText)
+    editEvent = EditEvent()
+
+    editEvent.addArgument('text', UI_WIDGETS.contentViewText)
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
@@ -149,6 +158,7 @@ if __name__ == '__main__':
     UI_WIDGETS.copyContentEvent.connect(copyContent)
     UI_WIDGETS.closeFileEvent.connect(closeFile)
     # UI connect end
+    editEvent.connect(FILE.edit)
     editEvent.connect(editor.check)
     # extend connect with MAIN_WINDOW
     editor.logEvent.connect(log)
