@@ -122,7 +122,7 @@ def setTags():
 
 def check(**args):
     """Main function to call."""
-    # logEvent.emit(f'Checking {event.__str__()}...')
+    # SELF_MC['log'](f'Checking {event.__str__()}...')
     startTime = time.time()
     # Save the insert position
     insertRow, insertColumn = map(int, SELF_UI.textViewer.index('insert').split('.'))
@@ -130,7 +130,7 @@ def check(**args):
     content = SELF_UI.textViewer.get('1.0', 'end')
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
-    logEvent.emit('Scanning the file row by row...')
+    SELF_MC['log']('Scanning the file row by row...')
 
     for rowIndex, strRow in enumerate(rows):  # TODO improve the speed of checking
         # update the row first to clean the outdate marks off
@@ -182,4 +182,4 @@ def check(**args):
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
 
     spentTime = round(time.time() - startTime, 2)
-    logEvent.emit(f'Finished checking in {spentTime}s,insert position {insertRow}.{insertColumn}...')
+    SELF_MC['log'](f'Finished checking in {spentTime}s,insert position {insertRow}.{insertColumn}...')
