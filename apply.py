@@ -36,7 +36,7 @@ class TextFile(object):
         # create variables end
         if isNew is False:
             self.__loadFile()
-            UI_WIDGETS.contentViewText.insert('1.0', self.strFile)
+            UI_WIDGETS.textViewer.insert('1.0', self.strFile)
         else:
             log('Create empty file.')
 
@@ -61,7 +61,7 @@ class TextFile(object):
 
     def save(self, encoding='utf-8'):
         """Save the file with path"""
-        content = UI_WIDGETS.contentViewText.get('1.0', 'end')[:-1]  # need not the last \n
+        content = UI_WIDGETS.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
 
         if self.path == 'Untitle.txt':
             self.path = tkinter.filedialog.asksaveasfilename(title='Save new file')
@@ -85,7 +85,7 @@ class TextFile(object):
             if ans: self.save()  # save file
 
         del self.bitFile, self.strFile, self.path, self.isSave, self.isOpened
-        UI_WIDGETS.contentViewText.delete('1.0', 'end')
+        UI_WIDGETS.textViewer.delete('1.0', 'end')
 
         UI_WIDGETS.fillEmptyText()
         MAIN_WINDOW.title(ui.WINDOWS_CONFIG['init_title'])
@@ -135,7 +135,7 @@ def openWorkDir():
 
 
 def copyContent():
-    content = UI_WIDGETS.contentViewText.get('0.0', 'end')
+    content = UI_WIDGETS.textViewer.get('0.0', 'end')
     import pyperclip
     pyperclip.copy(content)
     del pyperclip
@@ -151,13 +151,25 @@ if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
     UI_WIDGETS.fillEmptyText()
-    editor.setTags(UI_WIDGETS.contentViewText)  # config tags for color
     FILE = TextFile()  # point to text file in order not to let it deleted
+
+    extendInitArgs = {
+        'MAIN_WINDOW': MAIN_WINDOW,
+        'UI_WIDGETS': UI_WIDGETS,
+        'MAIN_CALL': {
+            'log': log,
+            'copy_content': copyContent,
+            'open_file': openFile,
+            'open_work_dir': openWorkDir,
+            'save': save,
+            'close_file': closeFile
+        }
+    }
+    # initialize extend
+    editor.initialize(**extendInitArgs)
 
     # Some event emitted by MAIN_WINDOW should create for extend(include editor)
     editEvent = EditEvent()
-
-    editEvent.addArgument('text', UI_WIDGETS.contentViewText)
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
@@ -168,8 +180,6 @@ if __name__ == '__main__':
     editEvent.connect(FILE.edit)
     editEvent.connect(editor.check)
     # extend connect with MAIN_WINDOW
-    editor.logEvent.connect(log)
-    # connect functions end
 
     MAIN_WINDOW.bind('<KeyRelease>', editEvent.emit)
 
