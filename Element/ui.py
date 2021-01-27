@@ -61,7 +61,7 @@ class MainWidgets(object):
         self.toolBarFrame = tkinter.Frame(self.windows, background='green', width=30)
         # Frame initialize end
 
-        self.contentViewText = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
+        self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
         self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
         self.fillEmptyLabel = tkinter.Label(self.displayFrame, font=FILL_TEXT_FONT)  # A label to fill text
         # Widget initialize end
@@ -78,19 +78,19 @@ class MainWidgets(object):
         self.displayFrame.pack(side='left', fill='both', expand=True)
         # Place the frame widget.
 
-        self.contentViewText.pack(expand=True, fill='both')
+        self.textViewer.pack(expand=True, fill='both')
         self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
     def fillEmptyText(self, string='No File'):
         """Fill the content view text with a big label with string."""
-        self.contentViewText.pack_forget()  # 先把原来的忘掉
+        self.textViewer.pack_forget()  # 先把原来的忘掉
         self.fillEmptyLabel.config(text=string)
         self.fillEmptyLabel.pack(fill='both', expand=True)  # 把填充物放上去
 
     def relieveEmptyText(self):
         """Delete the label that fill the empty text"""
         self.fillEmptyLabel.pack_forget()  # 忘记填充物
-        self.contentViewText.pack(expand=True, fill='both')
+        self.textViewer.pack(expand=True, fill='both')
 
 
 if __name__ == '__main__':
