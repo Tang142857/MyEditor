@@ -8,13 +8,16 @@ Copyright(c) DFSA Software Develop Center
 后期支持自定义关键字
 """
 import re
+import time
 
 from Element.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
+
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
-KEY_WORDS = ['main', 'if', '小说', '·', '：', ':']
-SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("“", "”", True), ("(", ")", False), ('‘', '’', True)]
+KEY_WORDS = ['main', 'if', '小说', '·', '：', ':', '电子书']
+SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("(", ")", False)]
+SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
 
 
 # inline start ,you needn't pay attention to here :)
@@ -47,8 +50,9 @@ class stack(object):
 
 
 def startSymbol(start):
-    def endSymbol(end):
-        return [start, end]
+    """闭包，用于__findArea"""
+    def endSymbol(end, full: bool):
+        return [start, end, full]
 
     return endSymbol
 
@@ -57,7 +61,8 @@ def __findArea(string: str, start="(", end=")", near=True):
     """
     在字符串中匹配start和end包围起来的内容（括号，人物对话之类的）\n
     near:是否需要最近匹配，例如字符串引号就是最近，括号则是最远
-    ouput:[start index,end index]
+    full:判断是否完整，bracket模式下不解析
+    ouput:[start index,end index,full]
 
     这东西的逻辑复杂，首先，正常情况下应该先出现start，然后end，start
     时创建修饰器保存index，到了end时，就取出最近的
@@ -71,14 +76,14 @@ def __findArea(string: str, start="(", end=")", near=True):
             indexStack.put(startSymbol(index))
         elif char == end:
             if indexStack.isEmpty():  # 空的说明没有前符号
-                indexList.append([0, index])
+                indexList.append([0, index, False])
             else:  # 正常，取出最近start
-                indexList.append((indexStack.get())(index))
+                indexList.append((indexStack.get())(index, True))
         else:
             pass
 
     for remain in indexStack:
-        indexList.append(remain(index))
+        indexList.append(remain(index, False))
 
     return indexList
 
@@ -97,6 +102,7 @@ def setTags(text):
 def check(text, event):
     """Main function to call."""
     logEvent.emit(f'Checking {event.__str__()}...')
+    startTime = time.time()
     # Save the insert position
     insertRow, insertColumn = map(int, text.index('insert').split('.'))
 
@@ -105,7 +111,7 @@ def check(text, event):
 
     logEvent.emit('Scanning the file row by row...')
 
-    for rowIndex, strRow in enumerate(rows):  # here is rows list
+    for rowIndex, strRow in enumerate(rows):  # TODO improve the speed of checking
         # update the row first to clean the outdate marks off
         text.delete(f'{rowIndex+1}.0', f'{rowIndex+1}.{len(strRow)}')
         text.insert(f'{rowIndex+1}.0', strRow)
@@ -136,5 +142,21 @@ def check(text, event):
                 text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
                 text.insert(f'{rowIndex+1}.{start}', target, 'bracket')
 
-    text.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME wrong position at row end
-    logEvent.emit(f'Finish checking ,insert position {insertRow}.{insertColumn}...')
+        # 引号
+        for targetMark in SAY_SIGNAL:
+            for area in __findArea(strRow, targetMark[0], targetMark[1], targetMark[2]):
+                if area[2]:  # 正常
+                    start, end = area[0], area[1]
+                    target = text.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                    text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                    text.insert(f'{rowIndex+1}.{start}', target, 'say')
+                else:
+                    start, end = area[0], area[1]
+                    target = text.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                    text.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
+                    text.insert(f'{rowIndex+1}.{start}', target, 'bracket')
+
+    text.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
+
+    spentTime = round(time.time() - startTime, 2)
+    logEvent.emit(f'Finished checking in {spentTime}s,insert position {insertRow}.{insertColumn}...')
