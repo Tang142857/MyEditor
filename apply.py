@@ -14,8 +14,8 @@ import tkinter.messagebox
 
 import exceptions
 from coreEditor import editor
-from coreElement import ui
-from coreElement.mainEvent import EditEvent
+from Element import ui
+from Element.mainEvent import EditEvent
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 

@@ -19,7 +19,7 @@ git clone https://github.com/Tang142857/TextbookChecker.git
 textbookchecker  
 │  .gitignore  
 │  apply.py--(主程序入口)  
-|  exceptions.py--(异常类)
+|  exceptions.py--(异常类)  
 │  LICENSE  
 │  README.md  
 │  
