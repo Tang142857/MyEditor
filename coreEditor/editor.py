@@ -9,7 +9,7 @@ Copyright(c) DFSA Software Develop Center
 """
 import re
 
-from coreElement.mainEvent import EditorLogEvent
+from Element.mainEvent import EditorLogEvent
 
 logEvent = EditorLogEvent()
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
