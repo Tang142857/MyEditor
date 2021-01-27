@@ -29,13 +29,12 @@ class TextFile(object):
         path: 若读取文件，需要传入path，创建的新文件没有path（None），保存时报错
         """
         self.path = path
-        self.isOpened = True
         self.isSave = False
 
         self.bitFile = None
         self.strFile = None
         # create variables end
-        if isNew is not True:
+        if isNew is False:
             self.__loadFile()
             UI_WIDGETS.contentViewText.insert('1.0', self.strFile)
         else:
@@ -91,6 +90,11 @@ class TextFile(object):
         UI_WIDGETS.fillEmptyText()
         MAIN_WINDOW.title(ui.WINDOWS_CONFIG['init_title'])
 
+    def dir(self):
+        """Return file's work dir."""
+        directoryPath = '/'.join(self.path.split('/')[:-1])
+        return directoryPath
+
 
 def openFile(path=None):
     """Clean up the text and insert new file"""
@@ -124,7 +128,10 @@ def save():
 
 
 def openWorkDir():
-    log('open work dir')
+    """Open work directory in Windows Explore"""
+    directoryPath = FILE.dir()
+    os.popen(f'start {directoryPath}')
+    log('Open work dir successsfully')
 
 
 def copyContent():

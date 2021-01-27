@@ -57,7 +57,8 @@ class MainWidgets(object):
 
         self.mainFrame = tkinter.Frame(self.windows)
         self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50, **BORDER_STYLE)
-        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=20)
+        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=15)
+        self.toolBarFrame = tkinter.Frame(self.windows, background='green', width=30)
         # Frame initialize end
 
         self.contentViewText = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
@@ -71,6 +72,8 @@ class MainWidgets(object):
         # Place the menu.
 
         self.statusShowFrame.pack(side='bottom', fill='x')
+        self.toolBarFrame.pack(side='left', fill='y')
+
         self.mainFrame.pack(side='top', fill='both', expand=True)
         self.displayFrame.pack(side='left', fill='both', expand=True)
         # Place the frame widget.
