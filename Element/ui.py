@@ -9,7 +9,7 @@ import tkinter
 import tkinter.scrolledtext
 
 try:
-    from coreElement import mainEvent
+    from Element import mainEvent
 except ImportError:  # to test the model only
     import mainEvent
 
