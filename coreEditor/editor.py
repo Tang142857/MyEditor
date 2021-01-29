@@ -103,7 +103,11 @@ def __findArea(string: str, start="(", end=")", near=True):
 
 
 def initialize(**args):
-    """核心editor初始化"""
+    """
+    核心editor初始化
+    required arguments:
+    MAIN_WINDOW UI_WIDGETS MAIN_CALL
+    """
     global SELF_MC, SELF_MW, SELF_UI
     SELF_MW = args['MAIN_WINDOW']
     SELF_UI = args['UI_WIDGETS']
@@ -113,7 +117,11 @@ def initialize(**args):
 
 
 def setTags():
-    """Config tags for color the word first."""
+    """
+    Config tags for color the word first.
+    
+    color meaning:
+    """
     SELF_UI.textViewer.tag_config('say', foreground='green')
     SELF_UI.textViewer.tag_config('bracket', foreground='blue', background='red')
     SELF_UI.textViewer.tag_config('key', foreground='orange', underline=True)
