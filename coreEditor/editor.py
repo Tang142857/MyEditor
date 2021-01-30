@@ -14,10 +14,11 @@ import re
 import time
 
 # global variable define start
-SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
+# SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
 KEY_WORDS = ['main', 'if', '小说', '·', '：', ':', '电子书']
 SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("(", ")", False)]
 SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
+SPECIAL_CHARS = ['a', '#']
 
 # signals end
 
@@ -64,12 +65,18 @@ def startSymbol(start):
     return endSymbol
 
 
-def __findAreaByChar(char, string):
+def __findAreaByChar(char: str, string: str):
     """
     Find area by char.\nRequired arguments:char,string
     return [[startIndex,length]]
     """
-    pass  # TODO __findAreaByChar
+    finds = []
+
+    for index, ch in enumerate(string):
+        if ch == char:
+            finds.append([index, 1])
+
+    return finds
 
 
 def __findAreaByRe(reExpression, string):
@@ -117,6 +124,25 @@ def __findArea(string: str, start="(", end=")", near=True):
         indexList.append(remain(index, False))
 
     return indexList
+
+
+def __color(positionList: list, kind: str):
+    """
+    color the string with marks.\n
+    required arguments:positionList[row,startindex,length],kind: mark name
+    attention: all argments use index(start at 0)!!!
+    """
+    rowIndex = positionList[0]
+    startIndex = positionList[1]
+    length = positionList[2]
+    # get arguments
+
+    _str = SELF_UI.textViewer.get(f'{rowIndex+1}.{startIndex}', f'{rowIndex+1}.{startIndex+length}')
+    # get text before deleting it,for insert it again
+    SELF_UI.textViewer.delete(f'{rowIndex+1}.{startIndex}', f'{rowIndex+1}.{startIndex+length}')
+    # delete the string in text before
+    SELF_UI.textViewer.insert(f'{rowIndex+1}.{startIndex}', _str, kind)
+    # insert it again
 
 
 # inline end ,say secondly,don't pay attention at foregoing codes
@@ -168,16 +194,11 @@ def check(**args):
         SELF_UI.textViewer.insert(f'{rowIndex+1}.0', strRow)
 
         # 特殊字符
-        for target in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
-            finder = re.compile(target)
-            starts = [found.start() for found in finder.finditer(strRow)]
-            matches = [found.group() for found in finder.finditer(strRow)]
+        for targetChar in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
+            finds = __findAreaByChar(targetChar, strRow)
 
-            for colIndex, start in enumerate(starts):
-                SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{start+len(target)-1}')
-                # 注意，特殊字符偏移量不同
-                SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', matches[colIndex], 'warning')
-                # 注意，特殊字符去掉转义，give it back
+            for position in finds:
+                __color([rowIndex] + position, 'warning')
 
         # 自定义关键字
         for target in KEY_WORDS:  # 每一行逐个查找KEY是否存在
