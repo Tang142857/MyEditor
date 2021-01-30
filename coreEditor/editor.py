@@ -13,10 +13,6 @@ TBC extend standard
 import re
 import time
 
-from Element.mainEvent import EditorLogEvent
-
-logEvent = EditorLogEvent()
-
 # global variable define start
 SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
 KEY_WORDS = ['main', 'if', '小说', '·', '：', ':', '电子书']
@@ -66,6 +62,30 @@ def startSymbol(start):
         return [start, end, full]
 
     return endSymbol
+
+
+def __findAreaByChar(char, string):
+    """
+    Find area by char.\nRequired arguments:char,string
+    return [[startIndex,length]]
+    """
+    pass  # TODO __findAreaByChar
+
+
+def __findAreaByRe(reExpression, string):
+    """
+    Find area by re pattern.\nRequired argments:re expression,string
+    return [[startIndex,length]]
+    """
+    pass  # TODO __findAreaByRe
+
+
+def __findAreaByPart(part, string):
+    """
+    Find area by signal like ['(',')'].\nRequired argments:part,string
+    return [[startIndex,length]]
+    """
+    pass  # TODO __findAreaByPart
 
 
 def __findArea(string: str, start="(", end=")", near=True):
@@ -121,10 +141,12 @@ def setTags():
     Config tags for color the word first.
     
     color meaning:
+    key_word: key word,say: characters' say,bracket: bracket,
+    warning: unexpected char
     """
     SELF_UI.textViewer.tag_config('say', foreground='green')
     SELF_UI.textViewer.tag_config('bracket', foreground='blue', background='red')
-    SELF_UI.textViewer.tag_config('key', foreground='orange', underline=True)
+    SELF_UI.textViewer.tag_config('key_word', foreground='orange')
     SELF_UI.textViewer.tag_config('warning', foreground='red', background='yellow')
 
 
@@ -163,7 +185,7 @@ def check(**args):
 
             for start in starts:
                 SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{start+len(target)}')
-                SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'key')
+                SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'key_word')
 
         # 括号
         for targetMark in SPECIAL_RANGE:
