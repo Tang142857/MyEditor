@@ -12,6 +12,7 @@ TBC extend standard
 """
 import re
 import time
+from coreEditor import findTool
 
 # global variable define start
 # SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
