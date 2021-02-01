@@ -8,37 +8,44 @@ introduction:
 """
 
 
-def _getSide(target, nextSide):
+def _getSide(condition, nextSide):
     """生成一条边，边的条件和下一条边要在这时确定"""
     def _side(string: str, index: int):
         """
-        You must pay attention that if the side is the begin side,index should -1 (I will add 1).\n
-
         string: main string from match()
-        index: the last side's index
+        index: now side's index
         next side: if condition is right ,will call the next side.
         """
-        myIndex = index + 1
-        if string[myIndex] == target:
-            return nextSide(string, myIndex)
+        if string[index] == condition:
+            return nextSide(string, index + 1)
         else:
             return None
 
-    return side
+    return _side
 
 
-def _getEndSide(target):
+def _getEndSide(condition):
     """生成终边，其他与_getSide一致"""
     def _endSide(string: str, index: int):
         """
         almost the same as side(),but if my condition is right,well return myIndex.
 
         string: main string from match()
-        index: the last side's index
+        index: now side's index
         No next side.
         """
-        myIndex = index + 1
-        if string[myIndex] == target:
-            return myIndex
+        if string[index] == condition:
+            return index
         else:
             return None
+
+    return _endSide
+
+
+if __name__ == '__main__':
+    t = 'abcdefabcedfjkjdsakjdncxmn(cndjaskncj(ccxzc)cx)'
+    f = _getSide('a', _getEndSide('b'))
+    for index, ch in enumerate(t):
+        if ch == 'a':
+            r = f(t, index)
+            print(r)
