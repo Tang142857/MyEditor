@@ -80,22 +80,6 @@ def __findAreaByChar(char: str, string: str):
     return finds
 
 
-def __findAreaByRe(reExpression, string):
-    """
-    Find area by re pattern.\nRequired argments:re expression,string
-    return [[startIndex,length]]
-    """
-    pass  # TODO __findAreaByRe
-
-
-def __findAreaByPart(part, string):
-    """
-    Find area by signal like ['(',')'].\nRequired argments:part,string
-    return [[startIndex,length]]
-    """
-    pass  # TODO __findAreaByPart
-
-
 def __findArea(string: str, start="(", end=")", near=True):
     """
     在字符串中匹配start和end包围起来的内容（括号，人物对话之类的）\n

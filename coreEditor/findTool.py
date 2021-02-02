@@ -8,6 +8,7 @@ introduction:
 """
 
 
+# side creator define start here
 def _getSide(condition, nextSide):
     """生成一条边，边的条件和下一条边要在这时确定"""
     def _side(string: str, index: int):
@@ -34,7 +35,7 @@ def _getEndSide(condition):
         index: now side's index
         No next side.
         """
-        if string[index] == condition:
+        if string[index] == condition:  # FIXME out of index error,if first condition at the line end
             return index
         else:
             return None
@@ -42,10 +43,54 @@ def _getEndSide(condition):
     return _endSide
 
 
+# side creator end here
+
+
+def _splitCondition(condition: str):
+    """Split the str condition to condition,just like \d \n..."""
+    if condition == '':
+        raise Exception('Please input your condition except empty!!!')
+
+    newCondition = []
+    for i in range(len(condition)):  # 颠倒条件
+        newCondition.append(condition[-(i + 1)])
+
+    return newCondition  # not support standard re expression until 2.0
+
+
+def _createAutoMachine(condition: str):
+    """生成自动机用于find函数启动匹配，注意自动机是根据表达式从后往前生成"""
+    conditions = _splitCondition(condition)
+    # get splited,upside down condition
+    lastSide = _getEndSide(conditions[0])
+    # create end side before create other sides
+    for condition in conditions[1:]:
+        lastSide = _getSide(condition, lastSide)
+
+    return lastSide, conditions[-1]
+
+
+# Public function start
+
+
+def findAreaByStr(condition: str, string: str):
+    """
+    Find area by string(not support re expression until 2.0)\n
+    :return: [[startIndex,endIndex]]
+    """
+    machine, firstCondition = _createAutoMachine(condition)
+    outputArea = []
+
+    for index, ch in enumerate(string):
+        if ch == firstCondition:  # 字符串匹配到第一条件，启动状态机
+            startIndex = index  # remember start index
+            result = machine(string, index)
+            if result is not None:
+                outputArea.append([startIndex, result])
+
+    return outputArea
+
+
 if __name__ == '__main__':
     t = 'abcdefabcedfjkjdsakjdncxmn(cndjaskncj(ccxzc)cx)'
-    f = _getSide('a', _getEndSide('b'))
-    for index, ch in enumerate(t):
-        if ch == 'a':
-            r = f(t, index)
-            print(r)
+    print(findAreaByStr('abc', t))
