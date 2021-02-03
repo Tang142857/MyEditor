@@ -219,3 +219,6 @@ def check(**args):
 
     spentTime = round(time.time() - startTime, 2)
     SELF_MC['log'](f'Finished checking in {spentTime}s,insert position {insertRow}.{insertColumn}...')
+
+
+# TODO 主程序类接口

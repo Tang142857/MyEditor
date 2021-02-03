@@ -27,6 +27,9 @@ def _getSide(condition, nextSide):
     def _interSide(string: str, index: int):
         """
         有向图中的多边，即同时连接了两条边\n
+        string: main string from match()
+        index: now side's index
+        next side: if condition is right ,will call the next side.
         """
 
     return _side
