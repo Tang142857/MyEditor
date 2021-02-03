@@ -3,6 +3,7 @@ Text Book Checker
 #### 说明
 
 简易可扩展编辑器
+README文件可能（几乎）不会跟上更新进度，请以实际代码为准
 
 #### Setup
 
@@ -39,7 +40,8 @@ UI内部提供交互事件关联到apply中的处理函数，作为单独的模�
 主要事件存放在mainEvent，被各个模块加载，因为都基于BaseEvent  
 编辑器提供检查服务  
 
-extend通过初始化传入的参数运行，包括了用户界面和核心调用（文件存取）  
+extensions通过初始化传入的参数运行，包括了用户界面和核心调用（文件存取）  
+更多的extensions规则正在优化  
 ```python
 extendInitArgs = {
     'MAIN_WINDOW': MAIN_WINDOW,
@@ -54,4 +56,8 @@ extendInitArgs = {
     }
 }
 ```
-apply除了启动，调用extend，加载、关闭文件，维持用户界面外什么都不干  
+##### extension
+extension负责实现应用的其他功能  
+MyEditor内置了部分插件来提供较为基础的功能  
+###### extension规则
+//当前规则仅为临时使用，正式规则将随1.0版本确定
