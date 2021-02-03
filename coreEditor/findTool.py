@@ -2,6 +2,7 @@
 A model for editor to find something.Just like re{}
 
 @author tang142857
+
 introduction:
 类似于正则表达式的查找模块，用于进行关键字染色（符号对支持，嵌套支持）和后期的查找功能
 正则原理：基于状态机的正则引擎（不使用标准正则语句）
@@ -13,6 +14,7 @@ def _getSide(condition, nextSide):
     """生成一条边，边的条件和下一条边要在这时确定"""
     def _side(string: str, index: int):
         """
+        有向图中的单边\n
         string: main string from match()
         index: now side's index
         next side: if condition is right ,will call the next side.
@@ -21,6 +23,11 @@ def _getSide(condition, nextSide):
             return nextSide(string, index + 1)
         else:
             return None
+
+    def _interSide(string: str, index: int):
+        """
+        有向图中的多边，即同时连接了两条边\n
+        """
 
     return _side
 
@@ -76,7 +83,7 @@ def _createAutoMachine(condition: str):
 def findAreaByStr(condition: str, string: str):
     """
     Find area by string(not support re expression until 2.0)\n
-    :return: [[startIndex,endIndex]]
+    :return: [[startIndex,length]]
     """
     machine, firstCondition = _createAutoMachine(condition)
     outputArea = []
@@ -84,9 +91,10 @@ def findAreaByStr(condition: str, string: str):
     for index, ch in enumerate(string):
         if ch == firstCondition:  # 字符串匹配到第一条件，启动状态机
             startIndex = index  # remember start index
-            result = machine(string, index)
-            if result is not None:
-                outputArea.append([startIndex, result])
+            endIndex = machine(string, index)
+            if endIndex is not None:
+                outputArea.append([startIndex, endIndex - startIndex + 1])
+                # return length with the first char ,so add 1
 
     return outputArea
 
