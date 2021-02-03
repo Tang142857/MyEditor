@@ -8,6 +8,7 @@ findTool为代码编辑器提供了查找功能，使用类似于正则表达式
 findTool不仅用于查找替换，更复杂的关键字匹配，范围符号匹配也调用了FT。
 
 ##### FindTool's interface:
+
 ```python
 findAreaByStr(condition,string)->list:...
 findAreaBySignalPart(condition,string)->list:...
