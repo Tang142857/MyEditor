@@ -1,9 +1,9 @@
 """
-main editor function
+code editor for MyEditor
 @author: tang142857
 Copyright(c) DFSA Software Develop Center
 
-主编辑器函数，提供 关键字高亮，缩进增强，搜索字符串等服务
+主编辑器函数，提供 关键字高亮，缩进增强，搜索字符串 等服务
 在每次释放键盘<key-release>后都执行，尽可能小
 后期支持自定义关键字
 
@@ -12,6 +12,9 @@ TBC extend standard
 """
 import re
 import time
+
+from extensions import base
+
 from coreEditor import findTool
 
 # global variable define start
@@ -222,3 +225,5 @@ def check(**args):
 
 
 # TODO 主程序类接口
+class codeEditor(base.BaseExtension):
+    pass  # TODO interface for apply
