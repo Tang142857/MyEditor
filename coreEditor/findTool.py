@@ -5,7 +5,6 @@ A model for editor to find something.Just like re{}
 
 introduction:
 类似于正则表达式的查找模块，用于进行关键字染色（符号对支持，嵌套支持）和后期的查找功能
-正则原理：基于状态机的正则引擎（不使用标准正则语句）
 """
 
 
@@ -24,6 +23,7 @@ def _getSide(condition, nextSide):
                 return nextSide(string, index + 1)
             else:
                 return None
+
         except IndexError:
             return None
 
@@ -34,7 +34,7 @@ def _getRecyclableSide(nextSide):
     """生成二向边，边的条件和下一条边要在这时确定，condition使用endside的condition"""
     def _side(string: str, index):
         """
-        特殊的边，支持多次匹配，condition即为结束条件
+        特殊的边，支持多次匹配，condition即为结束条件\n
         not support self-define condition between range until 2.0
         """
         try:
@@ -42,6 +42,7 @@ def _getRecyclableSide(nextSide):
                 return result  # if next side is ok,return result
             elif string[index]:  # can't match the remaining machine,next character
                 return _side(string, index + 1)
+
         except IndexError:
             return None
 
@@ -63,6 +64,7 @@ def _getEndSide(condition):
                 return index
             else:
                 return None
+
         except IndexError:
             return None
 
@@ -95,15 +97,40 @@ def _createAutoMachineByStr(condition: str):
     return lastSide, conditions[-1]
 
 
-def _createAutoMachineByList(condition: list):
+def _createAutoMachineByList(condition: list, strict: bool):
     """符号对自动机生成器"""
     if len(condition) != 2: raise RuntimeError('Condition can be compiled.')
 
+    # 严格匹配用该函数
+    def _findNextBracket(string: str, nowBracketIndex: int):
+        """
+        Find the next/last bracket(I try my best to use re expression,but I failed :( )
+        condition is the signal part list like ['(',')']
+
+        :return: next/last bracket index
+        """
+        if (nowBracketIndex) >= len(string): return None
+        # it is the last char of the string
+        nowBracketIndex += 1
+        layerNumberEntered = 0
+
+        for index, char in enumerate(string[nowBracketIndex:]):
+            index += nowBracketIndex  # get the real index
+            if char == condition[0]:
+                layerNumberEntered += 1  # enter one layer of bracket
+            elif char == condition[1]:
+                if not layerNumberEntered: return index
+                else: layerNumberEntered -= 1  # jump out
+
+        return None  # can't find the other part of signal
+
+    # 宽松匹配用lastside
     lastSide = _getEndSide(condition[1])
     lastSide = _getRecyclableSide(lastSide)
     lastSide = _getSide(condition[0], lastSide)
 
-    return lastSide, condition[0]  # remember return start condition
+    if strict: return _findNextBracket, condition[0]  # remember return start condition
+    else: return lastSide, condition[0]
 
 
 # Public function start
@@ -115,7 +142,7 @@ def findAreaByStr(condition: str, string: str):
     :return: [[startIndex,length]]
     """
     machine, firstCondition = _createAutoMachineByStr(condition)
-    outputArea = []  # TODO 递归匹配范围符号
+    outputArea = []
 
     for index, ch in enumerate(string):
         if ch == firstCondition:  # 字符串匹配到第一条件，启动状态机
@@ -128,27 +155,29 @@ def findAreaByStr(condition: str, string: str):
     return outputArea
 
 
-def findAreaBySignalPart(condition: list, string: str, limit=0):
+def findAreaBySignalPart(condition: list, string: str, isStrict=True):
     """
     Find area by 范围符号 like :() \n
     do not use limit ,it is just for inline function to use
 
     :return: [[startIndex,length]]
     """
-    machine, firstCondition = _createAutoMachineByList(condition)
+    machine, firstCondition = _createAutoMachineByList(condition, isStrict)
     outputArea = []
+    hadNotMatched = True
 
-    for index, ch in enumerate(string[limit:]):
-        if ch == firstCondition:  # FIXME 括号嵌套
+    for index, ch in enumerate(string):
+        if (ch == firstCondition) and hadNotMatched:
             startIndex = index
             endIndex = machine(string, index)
             if endIndex is not None:
                 outputArea.append([startIndex, endIndex - startIndex + 1])
+                if not isStrict: hadNotMatched = not hadNotMatched
 
     return outputArea
 
 
 if __name__ == '__main__':
-    t = 'mn(dsdhdhabcsajkdh)a)'
+    t = 'mn"dsdhdh"abcsajkdh"a)'
     print(findAreaByStr('abc', t))
-    print(findAreaBySignalPart(['(', ')'], t))
+    print(findAreaBySignalPart(['"', '"'], t, False))
