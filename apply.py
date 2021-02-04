@@ -84,7 +84,7 @@ class TextFile(object):
             ans = tkinter.messagebox.askyesno('Save', 'File has not saved,save it right now?\n文件未保存，保存？')
             if ans: self.save()  # save file
 
-        del self.bitFile, self.strFile, self.path, self.isSave, self.isOpened
+        del self.bitFile, self.strFile, self.path, self.isSave
         UI_WIDGETS.textViewer.delete('1.0', 'end')
 
         UI_WIDGETS.fillEmptyText()
