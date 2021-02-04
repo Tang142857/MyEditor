@@ -19,25 +19,31 @@ def _getSide(condition, nextSide):
         index: now side's index
         next side: if condition is right ,will call the next side.
         """
-        if string[index] == condition:
-            return nextSide(string, index + 1)
-        else:
+        try:
+            if string[index] == condition:
+                return nextSide(string, index + 1)
+            else:
+                return None
+        except IndexError:
             return None
 
     return _side
 
 
-def _getRecyclableSide(condition, nextSide):
+def _getRecyclableSide(q, nextSide):
     """生成二向边，边的条件和下一条边要在这时确定，condition使用endside的condition"""
     def _side(string: str, index):
         """
         特殊的边，支持多次匹配，condition即为结束条件
         not support self-define condition between range until 2.0
         """
-        if string[index] == condition:
-            return nextSide(string, index)  # end the match right now ,needn't add 1
-        elif string[index]:  # is a character
-            return _side(string, index + 1)
+        try:
+            if (result := nextSide(string, index)):  # ask the next side ,is ok?(needn't add 1,if *)
+                return result  # if next side is ok,return result
+            elif string[index]:  # can't match the remaining machine,next character
+                return _side(string, index + 1)
+        except IndexError:
+            return None
 
     return _side
 
@@ -52,9 +58,12 @@ def _getEndSide(condition):
         index: now side's index
         No next side.
         """
-        if string[index] == condition:  # FIXME out of index error,if first condition at the line end
-            return index
-        else:
+        try:
+            if string[index] == condition:
+                return index
+            else:
+                return None
+        except IndexError:
             return None
 
     return _endSide
@@ -140,6 +149,6 @@ def findAreaBySignalPart(condition: list, string: str, limit=0):
 
 
 if __name__ == '__main__':
-    t = 'mn()hh'
-    # print(findAreaByStr('abc', t))
+    t = 'mn(dsdhdhabcsajkdh)a)'
+    print(findAreaByStr('abc', t))
     print(findAreaBySignalPart(['(', ')'], t))
