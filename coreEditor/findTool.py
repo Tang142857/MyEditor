@@ -30,7 +30,7 @@ def _getSide(condition, nextSide):
     return _side
 
 
-def _getRecyclableSide(q, nextSide):
+def _getRecyclableSide(nextSide):
     """生成二向边，边的条件和下一条边要在这时确定，condition使用endside的condition"""
     def _side(string: str, index):
         """
@@ -100,7 +100,7 @@ def _createAutoMachineByList(condition: list):
     if len(condition) != 2: raise RuntimeError('Condition can be compiled.')
 
     lastSide = _getEndSide(condition[1])
-    lastSide = _getRecyclableSide(condition[1], lastSide)
+    lastSide = _getRecyclableSide(lastSide)
     lastSide = _getSide(condition[0], lastSide)
 
     return lastSide, condition[0]  # remember return start condition
@@ -139,7 +139,7 @@ def findAreaBySignalPart(condition: list, string: str, limit=0):
     outputArea = []
 
     for index, ch in enumerate(string[limit:]):
-        if ch == firstCondition:
+        if ch == firstCondition:  # FIXME 括号嵌套
             startIndex = index
             endIndex = machine(string, index)
             if endIndex is not None:

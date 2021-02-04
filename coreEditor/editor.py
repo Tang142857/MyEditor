@@ -12,6 +12,7 @@ TBC extend standard
 """
 import re
 import time
+from keyword import kwlist  # just for test
 
 from extensions import base
 
@@ -19,11 +20,12 @@ from coreEditor import findTool
 
 # global variable define start
 # SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
-KEY_WORDS = ['main', 'if', '小说', '·', '：', ':', '电子书']
-SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("(", ")", False)]
-SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
+KEY_WORDS = ['小说', '·', '：', ':', '电子书'] + kwlist
+
 SPECIAL_CHARS = ['a', '#']
 
+SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("(", ")", False)]
+SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
 # signals end
 
 # ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
@@ -69,20 +71,6 @@ def startSymbol(start):
     return endSymbol
 
 
-def __findAreaByChar(char: str, string: str):
-    """
-    Find area by char.\nRequired arguments:char,string
-    return [[startIndex,length]]
-    """
-    finds = []
-
-    for index, ch in enumerate(string):
-        if ch == char:
-            finds.append([index, 1])
-
-    return finds
-
-
 def __findArea(string: str, start="(", end=")", near=True):
     """
     在字符串中匹配start和end包围起来的内容（括号，人物对话之类的）\n
@@ -114,7 +102,7 @@ def __findArea(string: str, start="(", end=")", near=True):
     return indexList
 
 
-def __color(positionList: list, kind: str):
+def _color(positionList: list, kind: str):
     """
     color the string with marks.\n
     required arguments:positionList[row,startindex,length],kind: mark name
@@ -182,19 +170,18 @@ def check(**args):
         SELF_UI.textViewer.insert(f'{rowIndex+1}.0', strRow)
 
         # 特殊字符
-        for targetChar in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
-            finds = __findAreaByChar(targetChar, strRow)
+        for target in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
+            finds = findTool.findAreaByStr(target, strRow)
 
             for position in finds:
-                __color([rowIndex] + position, 'warning')
+                _color([rowIndex] + position, 'warning')
 
         # 自定义关键字
-        for target in KEY_WORDS:  # 每一行逐个查找KEY是否存在
-            starts = [found.start() for found in re.finditer(target, strRow)]  # get chars index
+        for target in KEY_WORDS:
+            finds = findTool.findAreaByStr(target, strRow)
 
-            for start in starts:
-                SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{start+len(target)}')
-                SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'key_word')
+            for position in finds:
+                _color([rowIndex] + position, 'key_word')
 
         # 括号
         for targetMark in SPECIAL_RANGE:
