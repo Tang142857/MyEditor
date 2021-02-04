@@ -158,7 +158,7 @@ def findAreaByStr(condition: str, string: str):
 def findAreaBySignalPart(condition: list, string: str, isStrict=True):
     """
     Find area by 范围符号 like :() \n
-    do not use limit ,it is just for inline function to use
+    isStrict: 严格模式，同级匹配（自己看代码）
 
     :return: [[startIndex,length]]
     """

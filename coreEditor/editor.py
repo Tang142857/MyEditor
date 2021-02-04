@@ -24,7 +24,7 @@ KEY_WORDS = ['小说', '·', '：', ':', '电子书'] + kwlist
 
 SPECIAL_CHARS = ['a', '#']
 
-SPECIAL_RANGE = [("'", "'", True), ('"', '"', True), ("(", ")", False)]
+SPECIAL_RANGE = [("'", "'", False), ('"', '"', False), ("(", ")", True)]
 SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
 # signals end
 
@@ -32,74 +32,6 @@ SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
 SELF_MW = None
 SELF_UI = None
 SELF_MC = {}  # 核心调用 e.g. openFile
-
-
-# inline start ,you needn't pay attention to here :)
-class stack(object):
-    def __init__(self):
-        self.mainList = []  # a list to save Python object
-
-    def put(self, obj):
-        self.mainList.append(obj)
-
-    def get(self):
-        lastDate = self.mainList[-1]
-        del self.mainList[-1]
-        return lastDate
-
-    def isEmpty(self):
-        if self.mainList == []:
-            return True
-        else:
-            return False
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.mainList != []:
-            return self.get()
-        else:
-            raise StopIteration
-
-
-def startSymbol(start):
-    """闭包，用于__findArea"""
-    def endSymbol(end, full: bool):
-        return [start, end, full]
-
-    return endSymbol
-
-
-def __findArea(string: str, start="(", end=")", near=True):
-    """
-    在字符串中匹配start和end包围起来的内容（括号，人物对话之类的）\n
-    near:是否需要最近匹配，例如字符串引号就是最近，括号则是最远
-    full:判断是否完整，bracket模式下不解析
-    ouput:[start index,end index,full]
-
-    这东西的逻辑复杂，首先，正常情况下应该先出现start，然后end，start
-    时创建闭包保存index，到了end时，就取出最近的
-    start并调用生成output。不正常的很好判断，直接从头到尾就行了
-    """
-    indexStack = stack()  # cell [start index,end index]
-    indexList = []
-
-    for index, char in enumerate(string):
-        if char == start and (indexStack.isEmpty() or (not near)):
-            indexStack.put(startSymbol(index))
-        elif char == end:
-            if indexStack.isEmpty():  # 空的说明没有前符号
-                indexList.append([0, index, False])
-            else:  # 正常，取出最近start
-                indexList.append((indexStack.get())(index, True))
-        else:
-            pass
-
-    for remain in indexStack:
-        indexList.append(remain(index, False))
-
-    return indexList
 
 
 def _color(positionList: list, kind: str):
@@ -147,7 +79,7 @@ def setTags():
     warning: unexpected char
     """
     SELF_UI.textViewer.tag_config('say', foreground='green')
-    SELF_UI.textViewer.tag_config('bracket', foreground='blue', background='red')
+    SELF_UI.textViewer.tag_config('bracket', foreground='blue')
     SELF_UI.textViewer.tag_config('key_word', foreground='orange')
     SELF_UI.textViewer.tag_config('warning', foreground='red', background='yellow')
 
@@ -184,26 +116,18 @@ def check(**args):
                 _color([rowIndex] + position, 'key_word')
 
         # 括号
-        for targetMark in SPECIAL_RANGE:
-            for area in __findArea(strRow, targetMark[0], targetMark[1], targetMark[2]):
-                start, end = area[0], area[1]
-                target = SELF_UI.textViewer.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'bracket')
+        for target in SPECIAL_RANGE:
+            finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
+
+            for position in finds:
+                _color([rowIndex] + position, 'bracket')
 
         # 引号
-        for targetMark in SAY_SIGNAL:
-            for area in __findArea(strRow, targetMark[0], targetMark[1], targetMark[2]):
-                if area[2]:  # 正常
-                    start, end = area[0], area[1]
-                    target = SELF_UI.textViewer.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                    SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                    SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'say')
-                else:
-                    start, end = area[0], area[1]
-                    target = SELF_UI.textViewer.get(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                    SELF_UI.textViewer.delete(f'{rowIndex+1}.{start}', f'{rowIndex+1}.{end+1}')
-                    SELF_UI.textViewer.insert(f'{rowIndex+1}.{start}', target, 'bracket')
+        for target in SAY_SIGNAL:
+            finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
+
+            for position in finds:
+                _color([rowIndex] + position, 'say')
 
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
 
