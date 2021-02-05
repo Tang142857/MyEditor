@@ -10,6 +10,7 @@ Copyright(c) DFSA Software Develop Center
 TBC extend standard
 都保证包含了：initialize（初始化插件）
 """
+import json
 import re
 import time
 from keyword import kwlist  # just for test
@@ -18,15 +19,20 @@ from extensions import base
 
 from coreEditor import findTool
 
-# global variable define start
-# SPECIAL_CHARS = [r'\!', r'\@', r'\#', r'\$', r'\%', r'\^', r'\&', r'\*', r'\d']  # 这里为了使用re就只能写成两个字符，一会要特殊计算偏移量
-KEY_WORDS = ['小说', '·', '：', ':', '电子书'] + kwlist
+punctuation = {
+    "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
+    "key_word": [],
+    "special_range": [["'", "'", False], ["\"", "\"", False], ["[", "]", True]],
+    "say_signal": [["“", "”", True], ["‘", "’", True]]
+}
 
-SPECIAL_CHARS = ['a', '#']
-
-SPECIAL_RANGE = [("'", "'", False), ('"', '"', False), ("(", ")", True)]
-SAY_SIGNAL = [("“", "”", True), ('‘', '’', True)]
-# signals end
+try:
+    with open('coreEditor/local.json', 'r', encoding='utf-8') as config:
+        localConfig = json.loads(config.read())
+except FileNotFoundError as msg:
+    print(f'Config not found at editor{msg}')
+else:
+    punctuation.update(localConfig)
 
 # ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
 SELF_MW = None
@@ -102,28 +108,28 @@ def check(**args):
         SELF_UI.textViewer.insert(f'{rowIndex+1}.0', strRow)
 
         # 特殊字符
-        for target in SPECIAL_CHARS:  # 每一行逐个查找KEY是否存在
+        for target in punctuation['special_key']:  # 每一行逐个查找KEY是否存在
             finds = findTool.findAreaByStr(target, strRow)
 
             for position in finds:
                 _color([rowIndex] + position, 'warning')
 
         # 自定义关键字
-        for target in KEY_WORDS:
+        for target in punctuation['key_word']:
             finds = findTool.findAreaByStr(target, strRow)
 
             for position in finds:
                 _color([rowIndex] + position, 'key_word')
 
         # 括号
-        for target in SPECIAL_RANGE:
+        for target in punctuation['special_range']:
             finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
 
             for position in finds:
                 _color([rowIndex] + position, 'bracket')
 
         # 引号
-        for target in SAY_SIGNAL:
+        for target in punctuation['say_signal']:
             finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
 
             for position in finds:
