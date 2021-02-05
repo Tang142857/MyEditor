@@ -13,13 +13,12 @@ TBC extend standard
 import json
 import re
 import time
-from keyword import kwlist  # just for test
 
 from extensions import base
 
 from coreEditor import findTool
 
-punctuation = {
+PUNCTUATION = {
     "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
     "key_word": [],
     "special_range": [["'", "'", False], ["\"", "\"", False], ["[", "]", True]],
@@ -32,7 +31,7 @@ try:
 except FileNotFoundError as msg:
     print(f'Config not found at editor{msg}')
 else:
-    punctuation.update(localConfig)
+    PUNCTUATION.update(localConfig)
 
 # ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
 SELF_MW = None
@@ -56,7 +55,44 @@ def _color(positionList: list, kind: str):
     SELF_UI.textViewer.delete(f'{rowIndex+1}.{startIndex}', f'{rowIndex+1}.{startIndex+length}')
     # delete the string in text before
     SELF_UI.textViewer.insert(f'{rowIndex+1}.{startIndex}', _str, kind)
+
+
     # insert it again
+def _scanRow(rowIndex: int, string: str):
+    """
+    Scan the row and color words.Use public interface needn't other arguments.
+    """
+    # update the row first to clean the outdate marks off
+    SELF_UI.textViewer.delete(f'{rowIndex+1}.0', f'{rowIndex+1}.{len(string)}')
+    SELF_UI.textViewer.insert(f'{rowIndex+1}.0', string)
+
+    # 特殊字符
+    for target in PUNCTUATION['special_key']:  # 每一行逐个查找KEY是否存在
+        finds = findTool.findAreaByStr(target, string)
+
+        for position in finds:
+            _color([rowIndex] + position, 'warning')
+
+    # 自定义关键字
+    for target in PUNCTUATION['key_word']:
+        finds = findTool.findAreaByStr(target, string)
+
+        for position in finds:
+            _color([rowIndex] + position, 'key_word')
+
+    # 括号
+    for target in PUNCTUATION['special_range']:
+        finds = findTool.findAreaBySignalPart(target[:2], string, target[2])
+
+        for position in finds:
+            _color([rowIndex] + position, 'bracket')
+
+    # 引号
+    for target in PUNCTUATION['say_signal']:
+        finds = findTool.findAreaBySignalPart(target[:2], string, target[2])
+
+        for position in finds:
+            _color([rowIndex] + position, 'say')
 
 
 # inline end ,say secondly,don't pay attention at foregoing codes
@@ -92,48 +128,17 @@ def setTags():
 
 def check(**args):
     """Main function to call."""
-    # SELF_MC['log'](f'Checking {event.__str__()}...')
     startTime = time.time()
     # Save the insert position
     insertRow, insertColumn = map(int, SELF_UI.textViewer.index('insert').split('.'))
+    nowRowIndex = insertRow - 1
 
     content = SELF_UI.textViewer.get('1.0', 'end')
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
     SELF_MC['log']('Scanning the file row by row...')
 
-    for rowIndex, strRow in enumerate(rows):  # TODO improve the speed of checking
-        # update the row first to clean the outdate marks off
-        SELF_UI.textViewer.delete(f'{rowIndex+1}.0', f'{rowIndex+1}.{len(strRow)}')
-        SELF_UI.textViewer.insert(f'{rowIndex+1}.0', strRow)
-
-        # 特殊字符
-        for target in punctuation['special_key']:  # 每一行逐个查找KEY是否存在
-            finds = findTool.findAreaByStr(target, strRow)
-
-            for position in finds:
-                _color([rowIndex] + position, 'warning')
-
-        # 自定义关键字
-        for target in punctuation['key_word']:
-            finds = findTool.findAreaByStr(target, strRow)
-
-            for position in finds:
-                _color([rowIndex] + position, 'key_word')
-
-        # 括号
-        for target in punctuation['special_range']:
-            finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
-
-            for position in finds:
-                _color([rowIndex] + position, 'bracket')
-
-        # 引号
-        for target in punctuation['say_signal']:
-            finds = findTool.findAreaBySignalPart(target[:2], strRow, target[2])
-
-            for position in finds:
-                _color([rowIndex] + position, 'say')
+    _scanRow(nowRowIndex, rows[nowRowIndex])  # FIXME initialize can't scan all file
 
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
 
@@ -143,4 +148,4 @@ def check(**args):
 
 # TODO 主程序类接口
 class codeEditor(base.BaseExtension):
-    pass  # TODO interface for apply
+    pass
