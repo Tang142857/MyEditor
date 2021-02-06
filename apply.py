@@ -14,9 +14,9 @@ import tkinter.messagebox
 
 import exceptions
 from Element import ui
-from Element.mainEvent import EditEvent
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
+# sys.path.append(os.getcwd() + '\\extensions')  # directly import extensions
 
 
 class TopInterface(object):
@@ -173,8 +173,8 @@ def getElement(arg: str):
 
 
 def _setTopInterface(me, modelAttributeNames):
+    """Create top interfaace for other extensions"""
     topInterface = TopInterface()
-    print(modelAttributeNames)
 
     for modelAttributeName in modelAttributeNames:
         if not modelAttributeName.startswith('_'):
@@ -182,6 +182,7 @@ def _setTopInterface(me, modelAttributeNames):
             setattr(topInterface, modelAttributeName, attributeObj)
 
     return topInterface
+
 
 if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
@@ -198,6 +199,9 @@ if __name__ == '__main__':
     UI_WIDGETS.closeFileEvent.connect(closeFile)
     # UI connect end
 
-    getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
+    # getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
+    from extensions.coreEditor.main import Extension
+    e = Extension(getElement)
+    e.onLoad()
 
     MAIN_WINDOW.mainloop()  # 主循环

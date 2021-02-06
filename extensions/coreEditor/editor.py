@@ -15,9 +15,7 @@ import re
 import time
 
 from extensions import base
-
-from coreEditor import findTool
-
+from extensions.coreEditor import findTool
 PUNCTUATION = {
     "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
     "key_word": [],
@@ -36,7 +34,6 @@ else:
 # ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
 SELF_MW = None
 SELF_UI = None
-SELF_MC = {}  # 核心调用 e.g. openFile
 
 
 def _color(positionList: list, kind: str):
@@ -97,19 +94,18 @@ def _scanRow(rowIndex: int, string: str):
 
 # inline end ,say secondly,don't pay attention at foregoing codes
 
+# def initialize(**args):
+#     """
+#     核心editor初始化
+#     required arguments:
+#     MAIN_WINDOW UI_WIDGETS MAIN_CALL
+#     """
+#     global SELF_MC, SELF_MW, SELF_UI
+#     SELF_MW = args['MAIN_WINDOW']
+#     SELF_UI = args['UI_WIDGETS']
+#     SELF_MC = args['MAIN_CALL']
 
-def initialize(**args):
-    """
-    核心editor初始化
-    required arguments:
-    MAIN_WINDOW UI_WIDGETS MAIN_CALL
-    """
-    global SELF_MC, SELF_MW, SELF_UI
-    SELF_MW = args['MAIN_WINDOW']
-    SELF_UI = args['UI_WIDGETS']
-    SELF_MC = args['MAIN_CALL']
-
-    setTags()
+#     setTags()
 
 
 def setTags():
@@ -126,9 +122,11 @@ def setTags():
     SELF_UI.textViewer.tag_config('warning', foreground='red', background='yellow')
 
 
-def check(**args):
-    """Main function to call."""
-    startTime = time.time()
+def check(*arg, **args):
+    """check content (not noly for code,but also for novel or .lrc and so on)."""
+    arguments = {'init': False}
+    arguments.update(args)
+
     # Save the insert position
     insertRow, insertColumn = map(int, SELF_UI.textViewer.index('insert').split('.'))
     nowRowIndex = insertRow - 1
@@ -136,16 +134,34 @@ def check(**args):
     content = SELF_UI.textViewer.get('1.0', 'end')
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
-    SELF_MC['log']('Scanning the file row by row...')
-
-    _scanRow(nowRowIndex, rows[nowRowIndex])  # FIXME initialize can't scan all file
+    # SELF_MC['log']('Scanning the file row by row...')
+    if arguments['init']:
+        for index, strRow in enumerate(rows):
+            _scanRow(index, strRow)
+    else:
+        _scanRow(nowRowIndex, rows[nowRowIndex])  # FIXME initialize can't scan all file
 
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
 
-    spentTime = round(time.time() - startTime, 2)
-    SELF_MC['log'](f'Finished checking in {spentTime}s,insert position {insertRow}.{insertColumn}...')
+    # SELF_MC['log'](f'Finished checking ,insert position {insertRow}.{insertColumn}...')
 
 
 # TODO 主程序类接口
 class codeEditor(base.BaseExtension):
-    pass
+    def __init__(self, interface):
+        super().__init__(interface)
+
+    def onLoad(self, **arg):
+        global SELF_UI, SELF_MW
+
+        SELF_MW = self._getElement('MAIN_WINDOW')
+        SELF_UI = self._getElement('UI_WIDGETS')
+        self._getElement('MAIN_WINDOW>bind')('<Key>', check)
+
+        setTags()
+        check(init=True)
+
+        self._getElement('log')('load core editor end')
+
+    def unLoad():
+        self._getElement('log')('unloading core editor...')
