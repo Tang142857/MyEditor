@@ -10,14 +10,11 @@ copyright: DFSA Software Develop Center
 
 class BaseExtension(object):
     """扩展接口"""
-    def _getWidgetByName(name: str):
-        pass
+    def _getElement(EPath):
+        return self.getElementFromMain(EPath)
 
-    def _getEventByName(name: str):
-        pass
-
-    def onLoad(MAIN_ARG, **arg):
-        pass
+    def onLoad(getElement, **arg):
+        self.getElementFromMain = getElement
 
     def unLoad():
         pass
@@ -26,3 +23,7 @@ class BaseExtension(object):
 class BaseInterface(object):
     """统一的接口，apply可能需要调用 not use widely until 2.0"""
     pass
+
+
+def loadExtensions(name: str):
+    pass  # TODO load extensions

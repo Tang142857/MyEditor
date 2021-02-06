@@ -13,11 +13,14 @@ import tkinter.filedialog
 import tkinter.messagebox
 
 import exceptions
-from coreEditor import editor
 from Element import ui
 from Element.mainEvent import EditEvent
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
+
+
+class TopInterface(object):
+    pass  # 解决获取顶层函数问题，部分模块直接使用该接口
 
 
 class TextFile(object):
@@ -147,29 +150,46 @@ def log(message):
     UI_WIDGETS.statusLabel.config(text=message)
 
 
+def getElement(arg: str):
+    """
+    For base extension to get main window's widget,event and function,\n
+    pay attention,you must be sure the element's path
+
+    grammar: element's path (father>attribute>attribute...) like UI_WIDGETS>textViewer
+    """
+    try:
+        requireThingPath = arg.split('>')
+
+        attribute = getattr(top, requireThingPath[0])
+
+        for nowAttributeName in requireThingPath[1:]:
+            attribute = getattr(attribute, nowAttributeName)
+
+        return attribute
+
+    except Exception as msg:
+        print(msg)
+        return None
+
+
+def _setTopInterface(me, modelAttributeNames):
+    topInterface = TopInterface()
+    print(modelAttributeNames)
+
+    for modelAttributeName in modelAttributeNames:
+        if not modelAttributeName.startswith('_'):
+            attributeObj = getattr(me, modelAttributeName)
+            setattr(topInterface, modelAttributeName, attributeObj)
+
+    return topInterface
+
 if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
     UI_WIDGETS.fillEmptyText()
     FILE = TextFile()  # point to text file in order not to let it deleted
 
-    extendInitArgs = {
-        'MAIN_WINDOW': MAIN_WINDOW,
-        'UI_WIDGETS': UI_WIDGETS,
-        'MAIN_CALL': {
-            'log': log,
-            'copy_content': copyContent,
-            'open_file': openFile,
-            'open_work_dir': openWorkDir,
-            'save': save,
-            'close_file': closeFile
-        }
-    }
-    # initialize extend
-    editor.initialize(**extendInitArgs)
-
-    # Some event emitted by MAIN_WINDOW should create for extend(include editor)
-    editEvent = EditEvent()
+    top = _setTopInterface(sys.modules[__name__], dir())
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
@@ -177,10 +197,7 @@ if __name__ == '__main__':
     UI_WIDGETS.copyContentEvent.connect(copyContent)
     UI_WIDGETS.closeFileEvent.connect(closeFile)
     # UI connect end
-    editEvent.connect(FILE.edit)
-    editEvent.connect(editor.check)
-    # extend connect with MAIN_WINDOW
 
-    MAIN_WINDOW.bind('<KeyRelease>', editEvent.emit)
+    getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
 
     MAIN_WINDOW.mainloop()  # 主循环
