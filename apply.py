@@ -116,7 +116,6 @@ def openFile(path=None):
     FILE = TextFile(False, path)
 
     # save file options
-    editEvent.emit('Call by apply.openFile')
     log(f'Opened file {path} successfully')
 
 
