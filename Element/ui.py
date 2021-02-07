@@ -34,6 +34,7 @@ class MainWidgets(object):
         self.saveEvent = mainEvent.SaveEvent()
         self.copyContentEvent = mainEvent.CopyContentEvent()
         self.closeFileEvent = mainEvent.CloseFileEvent()
+        self.loadExtensionsEvent = mainEvent.LoadExtensionsEvent()
 
     def __init__(self, windows: tkinter.Tk):
         self.__initEvents__()
@@ -51,6 +52,8 @@ class MainWidgets(object):
         fileMenu.add_separator()
         fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
         fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
+        fileMenu.add_separator()
+        fileMenu.add_command(label='Extension', command=self.loadExtensionsEvent.emit)
 
         self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
         # Menu set end

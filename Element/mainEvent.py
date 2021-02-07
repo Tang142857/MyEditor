@@ -1,5 +1,6 @@
 """
 Model that include all event.
+
 @author: Tang142857
 Copyright(c) DFSA Software Develop Center
 """
@@ -101,17 +102,9 @@ class CloseFileEvent(BaseEvent):
         super().__init__()
 
 
-class EditorLogEvent(BaseEvent):
-    """Override the BE to send log to status label"""
+class LoadExtensionsEvent(BaseEvent):
     def __init__(self):
         super().__init__()
-
-    def _do(self, message):
-        for func in self.callList:
-            func(message)
-
-    def decider(self, message):
-        self._do(message)
 
 
 class ExampleEvent(BaseEvent):

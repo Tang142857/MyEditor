@@ -33,16 +33,26 @@ class BaseInterface(object):
     pass
 
 
-def loadExtensions(name: str, getElement):
+def manage(kind: str, name: str, **args):
     """
     Import extension's lib and call extension's onLoad member function
-    :return: extension's interface object
+    :kind: load or unload
+    load: name: extensions' name,accessor = getElement
+    unload: name: extensions' name,extensions_object = extensions_object
+    :return: extension's interface object,or None(for unload)
     """
-    packagePath = 'extensions'  # extension lib
-    try:
-        model = importlib.import_module('.'.join((packagePath, name, 'main')))
-        interface = model.Extension(getElement)
-        interface.onLoad()
-        return interface
-    except ImportError as msg:
-        print(f'Load extension {name} failed ,please check your extension.')
+    if kind == 'load':
+        packagePath = 'extensions'  # extension lib
+
+        try:
+            model = importlib.import_module('.'.join((packagePath, name, 'main')))
+            model_object = model.Extension(args['accessor'])
+            model_object.onLoad()
+            return model_object
+
+        except ImportError as msg:
+            print(f'Load extension {name} failed ,please check your extension.')
+            return None
+
+    elif kind == 'unload':
+        pass  # TODO unload extensions

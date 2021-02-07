@@ -14,7 +14,7 @@ import tkinter.messagebox
 
 import exceptions
 from Element import ui
-from extensions.base import loadExtensions
+from extensions.base import manage
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 # sys.path.append(os.getcwd() + '\\extensions')  # directly import extensions
@@ -104,6 +104,7 @@ class TextFile(object):
         return directoryPath
 
 
+# public member function
 def openFile(path=None):
     """Clean up the text and insert new file"""
     try:
@@ -177,6 +178,21 @@ def getElement(arg: str):
         return None
 
 
+def loadExtensions(name=''):
+    """A function bases on extensions.base.manage to load extensions. Call by: self,ui"""
+    if name == '':
+        pass  # TODO ask user extensions
+    else:
+        pass
+
+    extensionObject = manage('load', name, accessor=getElement)
+    if extensionObject is not None:
+        setattr(extension_objects, name, extensionObject)
+    else:
+        log(f'Load {name} extension failed.')
+
+
+# protected member function,do not call this function
 def _setTopInterface(me, modelAttributeNames):
     """Create top interfaace for other extensions"""
     topInterface = TopInterface()
@@ -189,14 +205,6 @@ def _setTopInterface(me, modelAttributeNames):
     return topInterface
 
 
-def _loadExtension(name: str):
-    extensionInterface = loadExtensions(name, getElement)
-    if extensionInterface is not None:
-        setattr(extensions_interface, name, extensionInterface)
-    else:
-        log(f'Load {name} extension failed.')
-
-
 if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
@@ -204,16 +212,17 @@ if __name__ == '__main__':
     FILE = TextFile()  # point to text file in order not to let it deleted
 
     top = _setTopInterface(sys.modules[__name__], dir())
-    extensions_interface = ExtensionsInterface()
+    extension_objects = ExtensionsInterface()
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
     UI_WIDGETS.saveEvent.connect(save)
     UI_WIDGETS.copyContentEvent.connect(copyContent)
     UI_WIDGETS.closeFileEvent.connect(closeFile)
+    UI_WIDGETS.loadExtensionsEvent.connect(loadExtensions)
     # UI connect end
 
     # getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
-    _loadExtension('coreEditor')
+    loadExtensions('coreEditor')
 
     MAIN_WINDOW.mainloop()  # 主循环
