@@ -6,6 +6,7 @@ please override all the member function as possible as you can
 copyright: DFSA Software Develop Center
 @author: tang142857
 """
+import importlib  # for load extension function
 
 
 class BaseExtension(object):
@@ -32,5 +33,16 @@ class BaseInterface(object):
     pass
 
 
-def loadExtensions(name: str):
-    pass  # TODO load extensions
+def loadExtensions(name: str, getElement):
+    """
+    Import extension's lib and call extension's onLoad member function
+    :return: extension's interface object
+    """
+    packagePath = 'extensions'  # extension lib
+    try:
+        model = importlib.import_module('.'.join((packagePath, name, 'main')))
+        interface = model.Extension(getElement)
+        interface.onLoad()
+        return interface
+    except ImportError as msg:
+        print(f'Load extension {name} failed ,please check your extension.')

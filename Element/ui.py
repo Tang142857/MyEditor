@@ -97,4 +97,5 @@ if __name__ == '__main__':
     testWindow = tkinter.Tk()
     ui = MainWidgets(testWindow)
     ui.fillEmptyText('Test')
+    # res = ui.askQuestion('test', 'test')
     testWindow.mainloop()

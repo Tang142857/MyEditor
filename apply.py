@@ -14,6 +14,7 @@ import tkinter.messagebox
 
 import exceptions
 from Element import ui
+from extensions.base import loadExtensions
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 # sys.path.append(os.getcwd() + '\\extensions')  # directly import extensions
@@ -21,6 +22,10 @@ sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
 
 class TopInterface(object):
     pass  # 解决获取顶层函数问题，部分模块直接使用该接口
+
+
+class ExtensionsInterface(object):
+    pass
 
 
 class TextFile(object):
@@ -184,6 +189,14 @@ def _setTopInterface(me, modelAttributeNames):
     return topInterface
 
 
+def _loadExtension(name: str):
+    extensionInterface = loadExtensions(name, getElement)
+    if extensionInterface is not None:
+        setattr(extensions_interface, name, extensionInterface)
+    else:
+        log(f'Load {name} extension failed.')
+
+
 if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
@@ -191,6 +204,7 @@ if __name__ == '__main__':
     FILE = TextFile()  # point to text file in order not to let it deleted
 
     top = _setTopInterface(sys.modules[__name__], dir())
+    extensions_interface = ExtensionsInterface()
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
@@ -200,8 +214,6 @@ if __name__ == '__main__':
     # UI connect end
 
     # getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
-    from extensions.coreEditor.main import Extension
-    e = Extension(getElement)
-    e.onLoad()
+    _loadExtension('coreEditor')
 
     MAIN_WINDOW.mainloop()  # 主循环

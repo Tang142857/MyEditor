@@ -24,10 +24,10 @@ PUNCTUATION = {
 }
 
 try:
-    with open('coreEditor/local.json', 'r', encoding='utf-8') as config:
+    with open('\\'.join(__file__.split('\\')[:-1]) + '\\local.json', 'r', encoding='utf-8') as config:
         localConfig = json.loads(config.read())
 except FileNotFoundError as msg:
-    print(f'Config not found at editor{msg}')
+    print(f'Config not found at editor {msg},I am at {__file__}')
 else:
     PUNCTUATION.update(localConfig)
 
@@ -93,19 +93,6 @@ def _scanRow(rowIndex: int, string: str):
 
 
 # inline end ,say secondly,don't pay attention at foregoing codes
-
-# def initialize(**args):
-#     """
-#     核心editor初始化
-#     required arguments:
-#     MAIN_WINDOW UI_WIDGETS MAIN_CALL
-#     """
-#     global SELF_MC, SELF_MW, SELF_UI
-#     SELF_MW = args['MAIN_WINDOW']
-#     SELF_UI = args['UI_WIDGETS']
-#     SELF_MC = args['MAIN_CALL']
-
-#     setTags()
 
 
 def setTags():
