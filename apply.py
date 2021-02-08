@@ -187,6 +187,7 @@ def loadExtensions(name=''):
     extensionObject = manage('load', name, accessor=getElement)
     if extensionObject is not None:
         setattr(extension_objects, name, extensionObject)
+        log(f'Activating the extension {name}...')
     else:
         log(f'Load {name} extension failed.')
 

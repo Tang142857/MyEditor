@@ -29,26 +29,59 @@ class BaseExtension(object):
 
 
 class BaseInterface(object):
-    """统一的接口，apply可能需要调用 not use widely until 2.0"""
-    pass
+    """
+    统一的接口，提供给apply，特殊的，这里的baseinterface不需要被继承
+
+    接口有两大工作：1.指向extension让它不要被回收了，2.向外部提供调用接口（绑定事件之类的）
+    """
+    def __init__(self, extension_obj):
+        self._extension = extension_obj
+        # point to extension's object ,so that it won't disappear
+    def onload(self):
+        """On load the extension,usually call by apply to let it active"""
+        self._extension.onload()
+
+
+# extension 服务类 end
+# following are the manage function(just basical function,packed by others)
+def _createInterface(extensionObject):
+    """
+    Create public interface for apply
+    :return: public intreface:BaseInterface
+    """
+    public_interface = BaseInterface(extensionObject)
+    attributesList = dir(extensionObject)
+    attributesList.remove('onLoad')
+    attributesList.remove('unLoad')
+    # needn't onload/unload function(usually ,they not call by function except manage)
+
+    for attributeName in attributesList:
+        if not attributeName.startswith('_'):
+            attribute = getattr(extensionObject, attributeName)
+            if callable(attribute):
+                setattr(public_interface, attributeName, attribute)
+
+    return public_interface
 
 
 def manage(kind: str, name: str, **args):
     """
-    Import extension's lib and call extension's onLoad member function
+    Import extension's lib and call extension's onLoad member function,will not call onload(need apply)
+
     :kind: load or unload
-    load: name: extensions' name,accessor = getElement
-    unload: name: extensions' name,extensions_object = extensions_object
-    :return: extension's interface object,or None(for unload)
+        load: name: extensions' name,accessor = getElement
+        unload: name: extensions' name,extensions_object = extensions_object
+
+    :return: extension's interface,or None(for unload)
     """
     if kind == 'load':
         packagePath = 'extensions'  # extension lib
 
         try:
-            model = importlib.import_module('.'.join((packagePath, name, 'main')))
-            model_object = model.Extension(args['accessor'])
-            model_object.onLoad()
-            return model_object
+            model_object = importlib.import_module('.'.join((packagePath, name, 'main')))
+            extension_object = model_object.Extension(args['accessor'])
+            extension_interface = _createInterface(extension_object)
+            return extension_interface
 
         except ImportError as msg:
             print(f'Load extension {name} failed ,please check your extension.')
