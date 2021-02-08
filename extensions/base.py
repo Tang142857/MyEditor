@@ -37,9 +37,9 @@ class BaseInterface(object):
     def __init__(self, extension_obj):
         self._extension = extension_obj
         # point to extension's object ,so that it won't disappear
-    def onload(self):
+    def onLoad(self):
         """On load the extension,usually call by apply to let it active"""
-        self._extension.onload()
+        self._extension.onLoad()
 
 
 # extension 服务类 end

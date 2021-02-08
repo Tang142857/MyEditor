@@ -184,10 +184,11 @@ def loadExtensions(name=''):
     else:
         pass
 
-    extensionObject = manage('load', name, accessor=getElement)
-    if extensionObject is not None:
-        setattr(extension_objects, name, extensionObject)
+    extensionInterface = manage('load', name, accessor=getElement)
+    if extensionInterface is not None:
+        setattr(extension_interfaces, name, extensionInterface)
         log(f'Activating the extension {name}...')
+        getElement(f'extension_interfaces>{name}').onLoad()
     else:
         log(f'Load {name} extension failed.')
 
@@ -211,8 +212,8 @@ if __name__ == '__main__':
     UI_WIDGETS.fillEmptyText()
     FILE = TextFile()  # point to text file in order not to let it deleted
 
+    extension_interfaces = ExtensionsInterface()
     top = _setTopInterface(sys.modules[__name__], dir())
-    extension_objects = ExtensionsInterface()
 
     UI_WIDGETS.openEvent.connect(openFile)
     UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
