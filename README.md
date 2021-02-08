@@ -1,11 +1,11 @@
-Text Book Checker
+My Editor
 ===
-#### 说明
+# 说明
 
 简易可扩展编辑器
 README文件可能（几乎）不会跟上更新进度，请以实际代码为准
 
-#### Setup
+# Setup
 
 克隆本仓库到本地  
 ```bash
@@ -13,9 +13,9 @@ git clone https://github.com/Tang142857/TextbookChecker.git
 ```
 执行入口apply.py  
 
-#### 程序
+# 程序
 
-##### 文件
+## 文件
 
 textbookchecker  
 │  .gitignore  
@@ -29,25 +29,10 @@ textbookchecker
 │  │  ui.py--(用户界面)  
 │  │  __init__.py  
 
-##### 框架
+## 框架
 apply作为主程序，管理核心事件，负责加载所有的模块  
 UI内部提供交互事件关联到apply中的处理函数，作为单独的模块被加载  
-主要事件存放在mainEvent，被各个模块加载，因为都基于BaseEvent  
-编辑器提供检查服务  
+主要事件存放在mainEvent，一般只有apply使用（其他绑定用接口绑定）  
+其他服务插件提供
 
-extensions通过初始化传入的参数运行，包括了用户界面和核心调用（文件存取）  
-更多的extensions规则正在优化  
-```python
-extendInitArgs = {
-    'MAIN_WINDOW': MAIN_WINDOW,
-    'UI_WIDGETS': UI_WIDGETS,
-    'MAIN_CALL': {
-        'log': log,
-        'copy_content': copyContent,
-        'open_file': openFile,
-        'open_work_dir': openWorkDir,
-        'save': save,
-        'close_file': closeFile
-    }
-}
-```
+[Extension README](extensions/README.md)

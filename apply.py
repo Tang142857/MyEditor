@@ -17,7 +17,7 @@ from Element import ui
 from extensions.base import manage
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
-# sys.path.append(os.getcwd() + '\\extensions')  # directly import extensions
+RUN_ONCE = ['coreEditor']  # 立刻加载的插件，一般是ME的基础插件
 
 
 class TopInterface(object):
@@ -114,6 +114,7 @@ def openFile(path=None):
 
     global FILE  # 向file指针上面挂，不然函数返回就没了
     FILE = TextFile(False, path)
+    getElement('extension_interfaces>coreEditor>check')(init=True)
 
     # save file options
     log(f'Opened file {path} successfully')
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     UI_WIDGETS.loadExtensionsEvent.connect(loadExtensions)
     # UI connect end
 
-    # getElement('UI_WIDGETS>textViewer').insert('1.0', 'hello')
-    loadExtensions('coreEditor')
+    for extensionRunOnceName in RUN_ONCE:
+        loadExtensions(extensionRunOnceName)
 
     MAIN_WINDOW.mainloop()  # 主循环
