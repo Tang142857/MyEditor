@@ -121,20 +121,17 @@ def check(*arg, **args):
     content = SELF_UI.textViewer.get('1.0', 'end')
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
-    # SELF_MC['log']('Scanning the file row by row...')
     if arguments['init']:
         for index, strRow in enumerate(rows):
             _scanRow(index, strRow)
     else:
         _scanRow(nowRowIndex, rows[nowRowIndex])  # FIXME initialize can't scan all file
 
-    SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # FIXME flash insert
-
-    # SELF_MC['log'](f'Finished checking ,insert position {insertRow}.{insertColumn}...')
+    SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # give the insert back
 
 
-# TODO 主程序类接口
 class codeEditor(base.BaseExtension):
+    """基本都是直接调用了，直接看函数注释"""
     def __init__(self, interface):
         super().__init__(interface)
 
@@ -143,7 +140,7 @@ class codeEditor(base.BaseExtension):
 
         SELF_MW = self._getElement('MAIN_WINDOW')
         SELF_UI = self._getElement('UI_WIDGETS')
-        self._getElement('MAIN_WINDOW>bind')('<Key>', check)
+        self._getElement('MAIN_WINDOW>bind')('<KeyRelease>', check)
 
         setTags()
         check(init=True)
@@ -152,3 +149,22 @@ class codeEditor(base.BaseExtension):
 
     def unLoad():
         self._getElement('log')('unloading core editor...')
+
+    def check(self, *arg, **args):
+        check(*arg, **args)
+
+    def add_signal(self, kind: str, obj):
+        """Add signal."""
+        try:
+            PUNCTUATION[kind].append(obj)
+            return None
+        except Exception as msg:
+            return msg
+
+    def remove_signal(self, kind: str, obj):
+        """Remove signal"""
+        try:
+            PUNCTUATION[kind].remove(obj)
+            return None
+        except Exception as msg:
+            return msg
