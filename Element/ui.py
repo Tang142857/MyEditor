@@ -65,7 +65,11 @@ class MainWidgets(object):
         # Frame initialize end
 
         self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
-        self.statusLabel = tkinter.Label(self.statusShowFrame, text='Status', font=STATUS_FONT, anchor='w')
+        self.statusLabel = tkinter.Label(self.statusShowFrame,
+                                         text='Status',
+                                         font=STATUS_FONT,
+                                         anchor='w',
+                                         background='#007ACC')
         self.fillEmptyLabel = tkinter.Label(self.displayFrame, font=FILL_TEXT_FONT)  # A label to fill text
         # Widget initialize end
         self.applyWidgets()
