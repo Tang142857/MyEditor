@@ -14,7 +14,7 @@ except ImportError:  # to test the model only
     import mainEvent
 
 COMMON_FONT = ('宋体', 12)
-VIEWER_FONT = ('consolas', 11)
+VIEWER_FONT = ('宋体', 11)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 FILL_TEXT_FONT = ('Microsoft YaHei', 50)

@@ -14,6 +14,7 @@ import json
 import re
 import time
 import tkinter
+from tqdm import tqdm
 
 from Element import mainEvent, dialog
 from extensions import base
@@ -38,6 +39,7 @@ else:
 SELF_MW = None
 SELF_UI = None
 update_status = None
+console_log = None
 
 
 def _color(positionList: list, kind: str):
@@ -123,9 +125,8 @@ def _check(*arg, **args):
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
     if arguments['init']:
-        for index, strRow in enumerate(rows):
+        for index, strRow in enumerate(tqdm(rows, ncols=80,desc='Scanning:')):
             _scanRow(index, strRow)
-            # update_status(f'Scanning file ,now at line {index+1}...')
     else:
         _scanRow(nowRowIndex, rows[nowRowIndex])
 
@@ -158,10 +159,11 @@ class codeEditor(base.BaseExtension):
         super().__init__(interface)
 
     def onLoad(self, **arg):
-        global SELF_UI, SELF_MW, update_status
+        global SELF_UI, SELF_MW, update_status, console_log
         SELF_MW = self._getElement('MAIN_WINDOW')
         SELF_UI = self._getElement('UI_WIDGETS')
         update_status = self._getElement('log')
+        console_log = self._getElement('console_log')
         self._menuBar = EditMenu(SELF_MW)
         # set self global variables end
 
