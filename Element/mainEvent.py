@@ -26,6 +26,9 @@ class BaseEvent(object):
         else:
             raise ConnectException(str(func) + ' can not be called.')
 
+    def add_callback(self, func):
+        self.connect(func)
+
     def _do(self):
         """Call all the connected function."""
         for func in self.callList:
