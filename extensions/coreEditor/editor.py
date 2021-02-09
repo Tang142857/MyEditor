@@ -13,6 +13,7 @@ TBC extend standard
 import json
 import re
 import time
+import tkinter
 
 from extensions import base
 from extensions.coreEditor import findTool
@@ -95,7 +96,7 @@ def _scanRow(rowIndex: int, string: str):
 # inline end ,say secondly,don't pay attention at foregoing codes
 
 
-def setTags():
+def _setTags():
     """
     Config tags for color the word first.
     
@@ -109,7 +110,7 @@ def setTags():
     SELF_UI.textViewer.tag_config('warning', foreground='red', background='yellow')
 
 
-def check(*arg, **args):
+def _check(*arg, **args):
     """check content (not noly for code,but also for novel or .lrc and so on)."""
     arguments = {'init': False}
     arguments.update(args)
@@ -130,6 +131,19 @@ def check(*arg, **args):
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # give the insert back
 
 
+class EditMenu(tkinter.Menu):
+    """Editor menu bar"""
+    def __init__(self, master):
+        """Master=mainWindowMenu"""
+        super().__init__(master, tearoff=False)
+        # initialize father widget
+
+        self.add_command(label='Conut', command=None)
+        self.add_command(label='Recheck All', command=None)
+        self.add_command(label='Add rule', command=None)
+        self.add_command(label='Remove rule', command=None)
+
+
 class codeEditor(base.BaseExtension):
     """基本都是直接调用了，直接看函数注释"""
     def __init__(self, interface):
@@ -137,13 +151,16 @@ class codeEditor(base.BaseExtension):
 
     def onLoad(self, **arg):
         global SELF_UI, SELF_MW
-
         SELF_MW = self._getElement('MAIN_WINDOW')
         SELF_UI = self._getElement('UI_WIDGETS')
-        self._getElement('MAIN_WINDOW>bind')('<KeyRelease>', check)
+        self._menuBar = EditMenu(SELF_MW)
+        # set self global variables end
 
-        setTags()
-        check(init=True)
+        self._getElement('MAIN_WINDOW>bind')('<KeyRelease>', _check)
+        self._getElement('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
+
+        _setTags()
+        _check(init=True)
 
         self._getElement('log')('load core editor end')
 
@@ -151,7 +168,7 @@ class codeEditor(base.BaseExtension):
         self._getElement('log')('unloading core editor...')
 
     def check(self, *arg, **args):
-        check(*arg, **args)
+        _check(*arg, **args)
 
     def add_signal(self, kind: str, obj):
         """Add signal."""
