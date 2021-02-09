@@ -156,6 +156,11 @@ def log(message):
     UI_WIDGETS.statusLabel.config(text=message)
 
 
+def console_log(message, **args):
+    string = f'{__file__}:{message}'
+    print(string)
+
+
 def getElement(arg: str):
     """
     For base extension to get main window's widget,event and function,\n
