@@ -13,7 +13,7 @@ import tkinter.filedialog
 import tkinter.messagebox
 
 import exceptions
-from Element import ui
+from Element import ui, dialog
 from extensions.base import manage
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
@@ -181,7 +181,8 @@ def getElement(arg: str):
 def loadExtensions(name=''):
     """A function bases on extensions.base.manage to load extensions. Call by: self,ui"""
     if name == '':
-        pass  # TODO ask user extensions
+        name = dialog.ask_extension_name()
+        if name is None: return
     else:
         pass
 

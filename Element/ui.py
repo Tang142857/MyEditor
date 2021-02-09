@@ -59,8 +59,8 @@ class MainWidgets(object):
         # Menu set end
 
         self.mainFrame = tkinter.Frame(self.windows)
-        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50, **BORDER_STYLE)
-        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=15)
+        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50)
+        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=12)
         self.toolBarFrame = tkinter.Frame(self.windows, background='green', width=30)
         # Frame initialize end
 
