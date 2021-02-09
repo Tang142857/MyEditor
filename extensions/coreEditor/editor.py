@@ -4,7 +4,7 @@ code editor for MyEditor
 Copyright(c) DFSA Software Develop Center
 
 主编辑器函数，提供 关键字高亮，缩进增强，搜索字符串 等服务
-在每次释放键盘<key-release>后都执行，尽可能小
+在每次释放键盘<keyRelease>后都执行，尽可能小
 后期支持自定义关键字
 
 TBC extend standard
@@ -15,8 +15,10 @@ import re
 import time
 import tkinter
 
+from Element import mainEvent, dialog
 from extensions import base
 from extensions.coreEditor import findTool
+
 PUNCTUATION = {
     "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
     "key_word": [],
@@ -35,6 +37,7 @@ else:
 # ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
 SELF_MW = None
 SELF_UI = None
+update_status = None
 
 
 def _color(positionList: list, kind: str):
@@ -55,7 +58,6 @@ def _color(positionList: list, kind: str):
     SELF_UI.textViewer.insert(f'{rowIndex+1}.{startIndex}', _str, kind)
 
 
-    # insert it again
 def _scanRow(rowIndex: int, string: str):
     """
     Scan the row and color words.Use public interface needn't other arguments.
@@ -93,9 +95,6 @@ def _scanRow(rowIndex: int, string: str):
             _color([rowIndex] + position, 'say')
 
 
-# inline end ,say secondly,don't pay attention at foregoing codes
-
-
 def _setTags():
     """
     Config tags for color the word first.
@@ -114,6 +113,7 @@ def _check(*arg, **args):
     """check content (not noly for code,but also for novel or .lrc and so on)."""
     arguments = {'init': False}
     arguments.update(args)
+    startTime = time.time()
 
     # Save the insert position
     insertRow, insertColumn = map(int, SELF_UI.textViewer.index('insert').split('.'))
@@ -125,10 +125,13 @@ def _check(*arg, **args):
     if arguments['init']:
         for index, strRow in enumerate(rows):
             _scanRow(index, strRow)
+            # update_status(f'Scanning file ,now at line {index+1}...')
     else:
-        _scanRow(nowRowIndex, rows[nowRowIndex])  # FIXME initialize can't scan all file
+        _scanRow(nowRowIndex, rows[nowRowIndex])
 
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # give the insert back
+
+    if arguments['init']: update_status(f'Checking finished in {round(time.time()-startTime,2)}s.')
 
 
 class EditMenu(tkinter.Menu):
@@ -137,11 +140,16 @@ class EditMenu(tkinter.Menu):
         """Master=mainWindowMenu"""
         super().__init__(master, tearoff=False)
         # initialize father widget
+        self.conutPress = mainEvent.BaseEvent()
+        self.checkAllPreaa = mainEvent.BaseEvent()
+        self.addRulePress = mainEvent.BaseEvent()
+        self.removeRulePress = mainEvent.BaseEvent()
+        # create signal
 
-        self.add_command(label='Conut', command=None)
-        self.add_command(label='Recheck All', command=None)
-        self.add_command(label='Add rule', command=None)
-        self.add_command(label='Remove rule', command=None)
+        self.add_command(label='Conut', command=self.conutPress.emit)
+        self.add_command(label='Recheck All', command=self.checkAllPreaa.emit)
+        self.add_command(label='Add rule', command=self.addRulePress.emit)
+        self.add_command(label='Remove rule', command=self.removeRulePress.emit)
 
 
 class codeEditor(base.BaseExtension):
@@ -150,22 +158,36 @@ class codeEditor(base.BaseExtension):
         super().__init__(interface)
 
     def onLoad(self, **arg):
-        global SELF_UI, SELF_MW
+        global SELF_UI, SELF_MW, update_status
         SELF_MW = self._getElement('MAIN_WINDOW')
         SELF_UI = self._getElement('UI_WIDGETS')
+        update_status = self._getElement('log')
         self._menuBar = EditMenu(SELF_MW)
         # set self global variables end
 
         self._getElement('MAIN_WINDOW>bind')('<KeyRelease>', _check)
         self._getElement('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
+        # config main window
 
         _setTags()
         _check(init=True)
+        # initialize run
+
+        self._menuBar.checkAllPreaa.add_callback(self._checkAll)
+        self._menuBar.addRulePress.add_callback(self._add_signal)
 
         self._getElement('log')('load core editor end')
 
-    def unLoad():
+    def unLoad(self):
         self._getElement('log')('unloading core editor...')
+
+    def _checkAll(self):
+        _check(init=True)
+
+    def _add_signal(self):
+        name = dialog.ask('Add rule', 'Enter new rule.')
+        if name is None: return
+        self.add_signal('special_key', name)
 
     def check(self, *arg, **args):
         _check(*arg, **args)
