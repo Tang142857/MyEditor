@@ -69,7 +69,7 @@ def manage(kind: str, name: str, **args):
     Import extension's lib and call extension's onLoad member function,will not call onload(need apply)
 
     :kind: load or unload
-        load: name: extensions' name,accessor = getElement
+        load: name: extensions' name,accessor = get_element
         unload: name: extensions' name,extensions_object = extensions_object
 
     :return: extension's interface,or None(for unload)

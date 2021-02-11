@@ -30,10 +30,11 @@ class ExtensionsInterface(object):
 
 class TextFile(object):
     """文本文件类，用于打开，保存文件，以及储存文件状态（替代RUN_STATUS）和更多文件服务"""
-    def __init__(self, isNew=True, path='Untitle.txt'):
+
+    def __init__(self, is_new=True, path='Untitled.txt'):
         """
         初始化文件
-        isNew: 是否创建新文件，默认创建新文件
+        is_new: 是否创建新文件，默认创建新文件
         path: 若读取文件，需要传入path，创建的新文件没有path（None），保存时报错
         """
         self.path = path
@@ -42,8 +43,8 @@ class TextFile(object):
         self.bitFile = None
         self.strFile = None
         # create variables end
-        if isNew is False:
-            self.__loadFile()
+        if is_new is False:
+            self.__load_file()
             UI_WIDGETS.textViewer.insert('1.0', self.strFile)
         else:
             log('Create empty file.')
@@ -51,12 +52,12 @@ class TextFile(object):
         UI_WIDGETS.relieveEmptyText()
         MAIN_WINDOW.title(f'{ui.WINDOWS_CONFIG["init_title"]} - {self.path}')
 
-    def __loadFile(self):
+    def __load_file(self):
         """Mark sure file is real,and open it."""
         if (self.path is None) or (not os.path.isfile(self.path)):
             self.path = tkinter.filedialog.askopenfilename(title='Open new file')
             if self.path == '':
-                raise exceptions.OpenFileException('User has not choose a file.')  # user choose 'cancl'
+                raise exceptions.OpenFileException('User has not choose a file.')  # user choose 'cancel'
 
         with open(self.path, 'rb') as f:
             self.bitFile = f.read()  # open with bin for encode after load
@@ -71,9 +72,10 @@ class TextFile(object):
         """Save the file with path"""
         content = UI_WIDGETS.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
 
-        if self.path == 'Untitle.txt':
+        if self.path == 'Untitled.txt':
             self.path = tkinter.filedialog.asksaveasfilename(title='Save new file')
-            if self.path == '': return  # user choose cancal
+            if self.path == '':
+                return  # user choose cancel
 
         with open(self.path, 'wb') as f:
             f.write(content.encode(encoding))
@@ -84,13 +86,14 @@ class TextFile(object):
         """Options here only for receive the event from editor.editEvent ,and not to cause exceptions"""
         self.isSave = False
 
-        log('Edit file from textfile.edit')
+        log('Edit file from text file.edit')
 
     def close(self):
         """Make sure file is saved"""
         if self.isSave is False:
             ans = tkinter.messagebox.askyesno('Save', 'File has not saved,save it right now?\n文件未保存，保存？')
-            if ans: self.save()  # save file
+            if ans:
+                self.save()  # save file
 
         del self.bitFile, self.strFile, self.path, self.isSave
         UI_WIDGETS.textViewer.delete('1.0', 'end')
@@ -100,27 +103,27 @@ class TextFile(object):
 
     def dir(self):
         """Return file's work dir."""
-        directoryPath = '/'.join(self.path.split('/')[:-1])
-        return directoryPath
+        directory_path = '/'.join(self.path.split('/')[:-1])
+        return directory_path
 
 
 # public member function
-def openFile(path=None):
+def open_file(path=None):
     """Clean up the text and insert new file"""
     try:
-        closeFile()
+        close_file()
     except exceptions.CloseFileException as msg:
         log(msg.__str__())  # 报错多半是首次打开，没文件可以关
 
     global FILE  # 向file指针上面挂，不然函数返回就没了
     FILE = TextFile(False, path)
-    getElement('extension_interfaces>coreEditor>check')(init=True)
+    get_element('extension_interfaces>coreEditor>check')(init=True)
 
     # save file options
     log(f'Opened file {path} successfully')
 
 
-def closeFile():
+def close_file():
     """Clean up the window"""
     try:
         FILE.close()
@@ -136,14 +139,14 @@ def save():
     log('save file')
 
 
-def openWorkDir():
+def open_work_dir():
     """Open work directory in Windows Explore"""
-    directoryPath = FILE.dir()
-    os.popen(f'start {directoryPath}')
-    log('Open work dir successsfully')
+    directory_path = FILE.dir()
+    os.popen(f'start {directory_path}')
+    log('Open work dir successfully')
 
 
-def copyContent():
+def copy_content():
     content = UI_WIDGETS.textViewer.get('0.0', 'end')
     import pyperclip
     pyperclip.copy(content)
@@ -161,7 +164,7 @@ def console_log(message, **args):
     print(string)
 
 
-def getElement(arg: str):
+def get_element(arg: str):
     """
     For base extension to get main window's widget,event and function,\n
     pay attention,you must be sure the element's path
@@ -169,11 +172,11 @@ def getElement(arg: str):
     grammar: element's path (father>attribute>attribute...) like UI_WIDGETS>textViewer
     """
     try:
-        requireThingPath = arg.split('>')
+        require_thing_path = arg.split('>')
 
-        attribute = getattr(top, requireThingPath[0])
+        attribute = getattr(top, require_thing_path[0])
 
-        for nowAttributeName in requireThingPath[1:]:
+        for nowAttributeName in require_thing_path[1:]:
             attribute = getattr(attribute, nowAttributeName)
 
         return attribute
@@ -183,34 +186,35 @@ def getElement(arg: str):
         return None
 
 
-def loadExtensions(name=''):
+def load_extensions(name=''):
     """A function bases on extensions.base.manage to load extensions. Call by: self,ui"""
     if name == '':
         name = dialog.ask_extension_name()
-        if name is None: return
+        if name is None:
+            return
     else:
         pass
 
-    extensionInterface = manage('load', name, accessor=getElement)
-    if extensionInterface is not None:
-        setattr(extension_interfaces, name, extensionInterface)
+    extension_interface = manage('load', name, accessor=get_element)
+    if extension_interface is not None:
+        setattr(extension_interfaces, name, extension_interface)
         log(f'Activating the extension {name}...')
-        getElement(f'extension_interfaces>{name}').onLoad()
+        get_element(f'extension_interfaces>{name}').onLoad()
     else:
         log(f'Load {name} extension failed.')
 
 
 # protected member function,do not call this function
-def _setTopInterface(me, modelAttributeNames):
-    """Create top interfaace for other extensions"""
-    topInterface = TopInterface()
+def _set_top_interface(me, model_attribute_names):
+    """Create top interface for other extensions"""
+    top_interface = TopInterface()
 
-    for modelAttributeName in modelAttributeNames:
+    for modelAttributeName in model_attribute_names:
         if not modelAttributeName.startswith('_'):
-            attributeObj = getattr(me, modelAttributeName)
-            setattr(topInterface, modelAttributeName, attributeObj)
+            attribute_obj = getattr(me, modelAttributeName)
+            setattr(top_interface, modelAttributeName, attribute_obj)
 
-    return topInterface
+    return top_interface
 
 
 if __name__ == '__main__':
@@ -220,17 +224,17 @@ if __name__ == '__main__':
     FILE = TextFile()  # point to text file in order not to let it deleted
 
     extension_interfaces = ExtensionsInterface()
-    top = _setTopInterface(sys.modules[__name__], dir())
+    top = _set_top_interface(sys.modules[__name__], dir())
 
-    UI_WIDGETS.openEvent.connect(openFile)
-    UI_WIDGETS.openWorkDirEvent.connect(openWorkDir)
+    UI_WIDGETS.openEvent.connect(open_file)
+    UI_WIDGETS.openWorkDirEvent.connect(open_work_dir)
     UI_WIDGETS.saveEvent.connect(save)
-    UI_WIDGETS.copyContentEvent.connect(copyContent)
-    UI_WIDGETS.closeFileEvent.connect(closeFile)
-    UI_WIDGETS.loadExtensionsEvent.connect(loadExtensions)
+    UI_WIDGETS.copyContentEvent.connect(copy_content)
+    UI_WIDGETS.closeFileEvent.connect(close_file)
+    UI_WIDGETS.loadExtensionsEvent.connect(load_extensions)
     # UI connect end
 
     for extensionRunOnceName in RUN_ONCE:
-        loadExtensions(extensionRunOnceName)
+        load_extensions(extensionRunOnceName)
 
     MAIN_WINDOW.mainloop()  # 主循环
