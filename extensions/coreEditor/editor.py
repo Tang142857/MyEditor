@@ -157,16 +157,16 @@ class codeEditor(base.BaseExtension):
     def __init__(self, interface):
         super().__init__(interface)
 
-    def onLoad(self, **arg):
+    def on_load(self, **arg):
         global SELF_UI, SELF_MW, update_status
-        SELF_MW = self._getElement('MAIN_WINDOW')
-        SELF_UI = self._getElement('UI_WIDGETS')
-        update_status = self._getElement('log')
+        SELF_MW = self._get_element('MAIN_WINDOW')
+        SELF_UI = self._get_element('UI_WIDGETS')
+        update_status = self._get_element('log')
         self._menuBar = EditMenu(SELF_MW)
         # set self global variables end
 
-        self._getElement('MAIN_WINDOW>bind')('<KeyRelease>', _check)
-        self._getElement('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
+        self._get_element('MAIN_WINDOW>bind')('<KeyRelease>', _check)
+        self._get_element('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
         # config main window
 
         _setTags()
@@ -176,10 +176,10 @@ class codeEditor(base.BaseExtension):
         self._menuBar.checkAllPreaa.add_callback(self._checkAll)
         self._menuBar.addRulePress.add_callback(self._add_signal)
 
-        self._getElement('log')('load core editor end')
+        self._get_element('log')('load core editor end')
 
-    def unLoad(self):
-        self._getElement('log')('unloading core editor...')
+    def un_load(self):
+        self._get_element('log')('unloading core editor...')
 
     def _checkAll(self):
         _check(init=True)
