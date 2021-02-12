@@ -4,4 +4,4 @@ editor of TBC
 Copyright(c) DFSA Software Develop Center
 """
 
-print('Import editor...')
+print(f'Importing core editor at {__file__}')
