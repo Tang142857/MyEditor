@@ -15,6 +15,31 @@ class ConnectException(BaseException):
         return self.message
 
 
+class ArgumentPackage(object):
+    pass
+
+
+class Event(object):
+    """Stronger event object ,it allow you to add args,and pass to callbacks with event..."""
+    def __init__(self, **args):
+        self.callback_functions = []
+        self.event_args = ArgumentPackage()
+        for arg in args:  # bind arguments
+            setattr(self.event_args, arg, args[arg])
+
+    def add_callback(self, func):
+        assert callable(func), 'ERROR_IS_NOT_CALLABLE'
+        self.callback_functions.append(func)
+
+    def emit(self):
+        # TODO async rewrite
+        self._call()
+
+    def _call(self):
+        for cell in self.callback_functions:
+            cell(self.event_args)
+
+
 class BaseEvent(object):
     """Base event"""
     def __init__(self):
@@ -91,11 +116,6 @@ class OpenWorkDirEvent(BaseEvent):
 
 
 class CopyContentEvent(BaseEvent):
-    def __init__(self):
-        super().__init__()
-
-
-class EditEvent(BaseEventWithArgument):
     def __init__(self):
         super().__init__()
 

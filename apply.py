@@ -30,7 +30,6 @@ class ExtensionsInterface(object):
 
 class TextFile(object):
     """文本文件类，用于打开，保存文件，以及储存文件状态（替代RUN_STATUS）和更多文件服务"""
-
     def __init__(self, is_new=True, path='Untitled.txt'):
         """
         初始化文件
@@ -199,7 +198,7 @@ def load_extensions(name=''):
     if extension_interface is not None:
         setattr(extension_interfaces, name, extension_interface)
         log(f'Activating the extension {name}...')
-        get_element(f'extension_interfaces>{name}').onLoad()
+        get_element(f'extension_interfaces>{name}').on_load()
     else:
         log(f'Load {name} extension failed.')
 
