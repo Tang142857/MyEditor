@@ -20,7 +20,11 @@ class ArgumentPackage(object):
 
 
 class Event(object):
-    """Stronger event object ,it allow you to add args,and pass to callbacks with event..."""
+    """
+    Stronger event object ,it allow you to add args,and pass to callbacks with event...
+    Now ,you can pass arguments even emit the event.
+    But pay attention all arguments will be packed in event_args.
+    """
     def __init__(self, **args):
         self.callback_functions = []
         self.event_args = ArgumentPackage()
@@ -31,8 +35,10 @@ class Event(object):
         assert callable(func), 'ERROR_IS_NOT_CALLABLE'
         self.callback_functions.append(func)
 
-    def emit(self):
+    def emit(self, **args):
         # TODO async rewrite
+        for arg in args:
+            setattr(self.event_args, arg, args[arg])
         self._call()
 
     def _call(self):

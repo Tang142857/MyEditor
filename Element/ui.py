@@ -19,7 +19,7 @@ BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 FILL_TEXT_FONT = ('Microsoft YaHei', 50)
 
-WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'Text Book Checker'}
+WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'MyEditor'}
 # global variable end
 
 
@@ -45,17 +45,17 @@ class MainWidgets(object):
 
         self.mainWindowMenu = tkinter.Menu(self.windows)
 
-        fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
-        fileMenu.add_command(label='Open', command=self.openEvent.emit)
-        fileMenu.add_command(label='Save', command=self.saveEvent.emit)
-        fileMenu.add_command(label='Close file', command=self.closeFileEvent.emit)
-        fileMenu.add_separator()
-        fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
-        fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
-        fileMenu.add_separator()
-        fileMenu.add_command(label='Extension', command=self.loadExtensionsEvent.emit)
+        self.fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
+        # self.fileMenu.add_command(label='Open', command=self.openEvent.emit)
+        # self.fileMenu.add_command(label='Save', command=self.saveEvent.emit)
+        # self.fileMenu.add_command(label='Close file', command=self.closeFileEvent.emit)
+        # self.fileMenu.add_separator()
+        self.fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
+        # self.fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
+        self.fileMenu.add_separator()
+        self.fileMenu.add_command(label='Extension', command=self.loadExtensionsEvent.emit)
 
-        self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
+        self.mainWindowMenu.add_cascade(label='File', menu=self.fileMenu, underline=1)
         # Menu set end
 
         self.mainFrame = tkinter.Frame(self.windows)

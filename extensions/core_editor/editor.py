@@ -17,7 +17,7 @@ import tkinter
 
 from Element import mainEvent, dialog
 from extensions import base
-from extensions.coreEditor import findTool
+from extensions.core_editor import findTool
 
 PUNCTUATION = {
     "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
