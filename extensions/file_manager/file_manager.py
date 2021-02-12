@@ -55,7 +55,7 @@ class TextFile(object):
 
     def save(self, encoding='utf-8'):
         """Save the file with path"""
-        content = UI_WIDGETS.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
+        content = self.ui.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
 
         if self.path == 'Untitled.txt':
             self.path = tkinter.filedialog.asksaveasfilename(title='Save new file')
@@ -78,7 +78,7 @@ class TextFile(object):
         self.ui.textViewer.delete('1.0', 'end')
 
         self.ui.fillEmptyText()
-        self.main_window.title(ui.WINDOWS_CONFIG['init_title'])
+        self.main_window.title('MyEditor')
 
     def dir(self):
         """Return file's work dir."""
@@ -95,6 +95,7 @@ class ManagerMenu(object):
         self.open_directory_event = Event()
         self.close_file_event = Event()
         # create event
+        self._master.add_separator()
         self._master.add_command(label='Open File', command=self.open_file_event.emit)
         self._master.add_command(label='Save File', command=self.write_file_event.emit)
         self._master.add_command(label='Close File', command=self.close_file_event.emit)
@@ -136,6 +137,8 @@ class Manager(base.BaseExtension):
                               self._get_element('MAIN_WINDOW'),
                               is_new=False,
                               path=file_path)
+
+        self._get_element('extension_interfaces>core_editor>check')(init=True)
 
     def save_file(self, event):
         self._file.save()

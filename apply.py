@@ -108,11 +108,7 @@ if __name__ == '__main__':
     extension_interfaces = ExtensionsInterface()
     top = _set_top_interface(sys.modules[__name__], dir())
 
-    UI_WIDGETS.openEvent.connect(open_file)
-    UI_WIDGETS.openWorkDirEvent.connect(open_work_dir)
-    UI_WIDGETS.saveEvent.connect(save)
     UI_WIDGETS.copyContentEvent.connect(copy_content)
-    UI_WIDGETS.closeFileEvent.connect(close_file)
     UI_WIDGETS.loadExtensionsEvent.connect(load_extensions)
     # UI connect end
 

@@ -29,11 +29,7 @@ class MainWidgets(object):
     """
     def __initEvents__(self):
         """Initialize all events."""
-        self.openWorkDirEvent = mainEvent.OpenWorkDirEvent()
-        self.openEvent = mainEvent.OpenEvent()
-        self.saveEvent = mainEvent.SaveEvent()
         self.copyContentEvent = mainEvent.CopyContentEvent()
-        self.closeFileEvent = mainEvent.CloseFileEvent()
         self.loadExtensionsEvent = mainEvent.LoadExtensionsEvent()
 
     def __init__(self, windows: tkinter.Tk):
@@ -46,14 +42,9 @@ class MainWidgets(object):
         self.mainWindowMenu = tkinter.Menu(self.windows)
 
         self.fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
-        # self.fileMenu.add_command(label='Open', command=self.openEvent.emit)
-        # self.fileMenu.add_command(label='Save', command=self.saveEvent.emit)
-        # self.fileMenu.add_command(label='Close file', command=self.closeFileEvent.emit)
-        # self.fileMenu.add_separator()
-        self.fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
-        # self.fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
+        self.fileMenu.add_command(label='Copy Content', command=self.copyContentEvent.emit)
         self.fileMenu.add_separator()
-        self.fileMenu.add_command(label='Extension', command=self.loadExtensionsEvent.emit)
+        self.fileMenu.add_command(label='Manage Extension', command=self.loadExtensionsEvent.emit)
 
         self.mainWindowMenu.add_cascade(label='File', menu=self.fileMenu, underline=1)
         # Menu set end
