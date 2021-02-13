@@ -49,10 +49,11 @@ class MainWidgets(object):
         self.mainWindowMenu.add_cascade(label='File', menu=self.fileMenu, underline=1)
         # Menu set end
 
-        self.mainFrame = tkinter.Frame(self.windows)
-        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50)
+        self.x_structure = tkinter.PanedWindow(self.windows, background='red')
+        # self.mainFrame = tkinter.Frame(self.windows)
+        self.displayFrame = tkinter.Frame(self.x_structure, width=200, height=50)
         self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=12)
-        self.toolBarFrame = tkinter.Frame(self.windows, background='green', width=30)
+        self.toolBarFrame = tkinter.Frame(self.x_structure, background='green', width=30)
         # Frame initialize end
 
         self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
@@ -70,12 +71,13 @@ class MainWidgets(object):
         # Place the menu.
 
         self.statusShowFrame.pack(side='bottom', fill='x')
-        self.toolBarFrame.pack(side='left', fill='y')
+        self.x_structure.add(self.toolBarFrame)
+        self.x_structure.add(self.displayFrame)
 
-        self.mainFrame.pack(side='top', fill='both', expand=True)
-        self.displayFrame.pack(side='left', fill='both', expand=True)
+        # self.displayFrame.pack(side='left', fill='both', expand=True)
         # Place the frame widget.
 
+        self.x_structure.pack(fill='both', expand=True)
         self.textViewer.pack(expand=True, fill='both')
         self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
