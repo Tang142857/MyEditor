@@ -9,7 +9,6 @@ Copyright(c) DFSA Software Develop Center
 import os
 import sys
 import tkinter
-import tkinter.filedialog
 import tkinter.messagebox
 
 import exceptions
@@ -21,11 +20,13 @@ RUN_ONCE = ['file_manager', 'core_editor']  # 立刻加载的插件，一般是M
 
 
 class TopInterface(object):
+    """Top interface of main window,for get_element to call"""
     pass  # 解决获取顶层函数问题，部分模块直接使用该接口
 
 
 class ExtensionsInterface(object):
-    pass
+    """Extensions' public interface, use 'extension_interfaces.extension_name.func' to call"""
+    pass  # 各个插件的公共接口
 
 
 def copy_content():
@@ -46,7 +47,7 @@ def console_log(message, **args):
     print(string)
 
 
-def get_element(arg: str):
+def get_element(element_path: str):
     """
     For base extension to get main window's widget,event and function,\n
     pay attention,you must be sure the element's path
@@ -54,11 +55,11 @@ def get_element(arg: str):
     grammar: element's path (father>attribute>attribute...) like UI_WIDGETS>textViewer
     """
     try:
-        require_thing_path = arg.split('>')
+        listed_element_path = element_path.split('>')
 
-        attribute = getattr(top, require_thing_path[0])
+        attribute = getattr(top, listed_element_path[0])
 
-        for nowAttributeName in require_thing_path[1:]:
+        for nowAttributeName in listed_element_path[1:]:
             attribute = getattr(attribute, nowAttributeName)
 
         return attribute
@@ -103,7 +104,6 @@ if __name__ == '__main__':
     MAIN_WINDOW = tkinter.Tk()
     UI_WIDGETS = ui.MainWidgets(MAIN_WINDOW)
     UI_WIDGETS.fillEmptyText()
-    # FILE = TextFile()  # point to text file in order not to let it deleted
 
     extension_interfaces = ExtensionsInterface()
     top = _set_top_interface(sys.modules[__name__], dir())
