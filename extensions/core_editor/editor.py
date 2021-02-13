@@ -11,7 +11,6 @@ TBC extend standard
 都保证包含了：initialize（初始化插件）
 """
 import json
-import re
 import time
 import tkinter
 
@@ -46,16 +45,16 @@ def _color(positionList: list, kind: str):
     required arguments:positionList[row,startindex,length],kind: mark name
     attention: all argments use index(start at 0)!!!
     """
-    rowIndex = positionList[0]
-    startIndex = positionList[1]
+    row_index = positionList[0]
+    start_index = positionList[1]
     length = positionList[2]
     # get arguments
 
-    _str = SELF_UI.textViewer.get(f'{rowIndex+1}.{startIndex}', f'{rowIndex+1}.{startIndex+length}')
+    _str = SELF_UI.textViewer.get(f'{row_index + 1}.{start_index}', f'{row_index + 1}.{start_index + length}')
     # get text before deleting it,for insert it again
-    SELF_UI.textViewer.delete(f'{rowIndex+1}.{startIndex}', f'{rowIndex+1}.{startIndex+length}')
+    SELF_UI.textViewer.delete(f'{row_index + 1}.{start_index}', f'{row_index + 1}.{start_index + length}')
     # delete the string in text before
-    SELF_UI.textViewer.insert(f'{rowIndex+1}.{startIndex}', _str, kind)
+    SELF_UI.textViewer.insert(f'{row_index + 1}.{start_index}', _str, kind)
 
 
 def _scanRow(rowIndex: int, string: str):
@@ -63,8 +62,8 @@ def _scanRow(rowIndex: int, string: str):
     Scan the row and color words.Use public interface needn't other arguments.
     """
     # update the row first to clean the outdate marks off
-    SELF_UI.textViewer.delete(f'{rowIndex+1}.0', f'{rowIndex+1}.{len(string)}')
-    SELF_UI.textViewer.insert(f'{rowIndex+1}.0', string)
+    SELF_UI.textViewer.delete(f'{rowIndex + 1}.0', f'{rowIndex + 1}.{len(string)}')
+    SELF_UI.textViewer.insert(f'{rowIndex + 1}.0', string)
 
     # 特殊字符
     for target in PUNCTUATION['special_key']:  # 每一行逐个查找KEY是否存在
@@ -131,11 +130,12 @@ def _check(*arg, **args):
 
     SELF_UI.textViewer.mark_set('insert', f'{insertRow}.{insertColumn}')  # give the insert back
 
-    if arguments['init']: update_status(f'Checking finished in {round(time.time()-startTime,2)}s.')
+    if arguments['init']: update_status(f'Checking finished in {round(time.time() - startTime, 2)}s.')
 
 
 class EditMenu(tkinter.Menu):
     """Editor menu bar"""
+
     def __init__(self, master):
         """Master=mainWindowMenu"""
         super().__init__(master, tearoff=False)
@@ -152,8 +152,9 @@ class EditMenu(tkinter.Menu):
         self.add_command(label='Remove rule', command=self.removeRulePress.emit)
 
 
-class codeEditor(base.BaseExtension):
+class CodeEditor(base.BaseExtension):
     """基本都是直接调用了，直接看函数注释"""
+
     def __init__(self, interface):
         super().__init__(interface)
 

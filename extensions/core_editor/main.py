@@ -5,4 +5,4 @@ Copyright(c) DFSA Software Develop Center
 """
 from extensions.core_editor import editor
 
-Extension = editor.codeEditor
+Extension = editor.CodeEditor

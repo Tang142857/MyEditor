@@ -49,30 +49,30 @@ class BaseInterface(object):
 
 
 # extension 服务类 end
-# following are the manage function(just basical function,packed by others)
+# following are the manage function(just base function,packed by others)
 def _create_interface(extension_object):
     """
     Create public interface for apply
-    :return: public intreface:BaseInterface
+    :return: public interface:BaseInterface
     """
     public_interface = BaseInterface(extension_object)
-    attributesList = dir(extension_object)
-    attributesList.remove('on_load')
-    attributesList.remove('un_load')
+    attributes_list = dir(extension_object)
+    attributes_list.remove('on_load')
+    attributes_list.remove('un_load')
     # needn't load/unload function(usually ,they not call by function except manage)
 
-    for attributeName in attributesList:
-        if not attributeName.startswith('_'):
-            attribute = getattr(extension_object, attributeName)
+    for attribute_name in attributes_list:
+        if not attribute_name.startswith('_'):
+            attribute = getattr(extension_object, attribute_name)
             if callable(attribute):
-                setattr(public_interface, attributeName, attribute)
+                setattr(public_interface, attribute_name, attribute)
 
     return public_interface
 
 
 def manage(kind: str, name: str, **args):
     """
-    Import extension's lib and call extension's on_load member function,will not call onload(need apply)
+    Import extension's lib and call extension's on_load member function,will not call on_load(need apply)
 
     :kind: load or unload
         load: name: extensions' name,accessor = get_element
@@ -81,10 +81,10 @@ def manage(kind: str, name: str, **args):
     :return: extension's interface,or None(for unload)
     """
     if kind == 'load':
-        packagePath = 'extensions'  # extension lib
+        package_path = 'extensions'  # extension lib
 
         try:
-            model_object = importlib.import_module('.'.join((packagePath, name, 'main')))
+            model_object = importlib.import_module('.'.join((package_path, name, 'main')))
             extension_object = model_object.Extension(args['accessor'])
             extension_interface = _create_interface(extension_object)
             return extension_interface
