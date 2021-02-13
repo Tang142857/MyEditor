@@ -124,7 +124,7 @@ class Manager(base.BaseExtension):
         pass
 
     def open_file(self, event):
-        """关闭上一文件，询问文件位置，初始化新文件"""
+        """关闭上一文件，询问文件位置，初始化新文件，调用全文检查"""
         self.close_file(None)
 
         try:
@@ -142,6 +142,7 @@ class Manager(base.BaseExtension):
 
     def save_file(self, event):
         self._file.save()
+        log('Saved file.')
 
     def close_file(self, event):
         """关闭文件，锁定viewer"""
@@ -151,7 +152,9 @@ class Manager(base.BaseExtension):
             print(msg)
 
         self._get_element('UI_WIDGETS').fillEmptyText()
+        log('Close file.')
 
     def go_directory(self, event):
         directory_path = self._file.dir()
         os.popen(f'start {directory_path}')
+        log(f'Go directory {directory_path}')

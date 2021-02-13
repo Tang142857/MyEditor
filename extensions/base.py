@@ -11,7 +11,7 @@ import importlib  # for load extension function
 
 class BaseExtension(object):
     """
-    扩展接口
+    扩展类，所有扩展都继承此类
     
     Please override every member function that are not protected.
     Please use the same init function ,like core_editor

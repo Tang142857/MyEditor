@@ -34,7 +34,6 @@ except FileNotFoundError as msg:
 else:
     PUNCTUATION.update(localConfig)
 
-# ui args start,all name with SELF_... ，用户UI，发射事件的时候是只有event的，提前储存“指针”
 SELF_MW = None
 SELF_UI = None
 update_status = None
@@ -140,10 +139,10 @@ class EditMenu(tkinter.Menu):
         """Master=mainWindowMenu"""
         super().__init__(master, tearoff=False)
         # initialize father widget
-        self.conutPress = mainEvent.BaseEvent()
-        self.checkAllPreaa = mainEvent.BaseEvent()
-        self.addRulePress = mainEvent.BaseEvent()
-        self.removeRulePress = mainEvent.BaseEvent()
+        self.conutPress = mainEvent.Event()
+        self.checkAllPreaa = mainEvent.Event()
+        self.addRulePress = mainEvent.Event()
+        self.removeRulePress = mainEvent.Event()
         # create signal
 
         self.add_command(label='Conut', command=self.conutPress.emit)
@@ -170,14 +169,13 @@ class CodeEditor(base.BaseExtension):
         self._menuBar = EditMenu(SELF_MW)
         # set self global variables end
 
-        self._get_element('MAIN_WINDOW>bind')('<KeyRelease>', _check)
-        self._get_element('UI_WIDGETS>textViewer').event_add("<<set-line-and-column>>", "<KeyRelease>",
-                                                             "<ButtonRelease>")
-        self._get_element('UI_WIDGETS>textViewer').bind('<<set-line-and-column>>', self._update_line_and_column)
-        self._get_element('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
-        self.position_show_label = tkinter.Label(self._get_element('UI_WIDGETS>statusShowFrame'),
+        SELF_MW.bind('<KeyRelease>', _check)
+        SELF_UI.textViewer.event_add("<<set-line-and-column>>", "<KeyRelease>", "<ButtonRelease>")
+        SELF_UI.textViewer.bind('<<set-line-and-column>>', self._update_line_and_column)
+        SELF_UI.mainWindowMenu.add_cascade(label='Editor', menu=self._menuBar)
+        self.position_show_label = tkinter.Label(SELF_UI.statusShowFrame,
                                                  background='#007ACC',
-                                                 text='Row:0,Col:0',
+                                                 text='Row:1,Col:0',
                                                  font=('Microsoft YaHei', 9))
         self.position_show_label.pack(side='right')
         # config main window
@@ -188,23 +186,39 @@ class CodeEditor(base.BaseExtension):
 
         self._menuBar.checkAllPreaa.add_callback(self._checkAll)
         self._menuBar.addRulePress.add_callback(self._add_signal)
+        self._menuBar.removeRulePress.add_callback(self._remove_signal)
+        self._update_line_and_column()
 
         self._get_element('log')('load core editor end')
 
     def un_load(self):
         self._get_element('log')('unloading core editor...')
 
+    # ######################### base function end here ############################
+    # following are the protected member functions
+    # these functions will not be added to public interface
+
     def _update_line_and_column(self, event=None):
         r_position, c_position = self._get_element('UI_WIDGETS>textViewer').index('insert').split('.')
         self.position_show_label.config(text=f'Row:{r_position},Col:{c_position}')
 
-    def _checkAll(self):
+    def _checkAll(self, event=None):
+        update_status('Call check all function...')
         _check(init=True)
 
-    def _add_signal(self):
+    def _add_signal(self, event=None):
         name = dialog.ask('Add rule', 'Enter new rule.')
         if name is None: return
         self.add_signal('special_key', name)
+
+    def _remove_signal(self, event=None):
+        name = dialog.ask('Remove rule', 'Enter rule you want to remove.')
+        if name is None: return
+        self.remove_signal('special_key', name)
+
+    # ########################## protected member functions end ##########################
+    # following are the puublic member function
+    # use it by extensions_interface (for other extensions)
 
     def check(self, *arg, **args):
         _check(*arg, **args)
