@@ -12,15 +12,19 @@ import importlib  # for load extension function
 class BaseExtension(object):
     """
     扩展接口
+    
     Please override every member function that are not protected.
-    Please use super.func() for every protected member function.
-    """
+    Please use the same init function ,like core_editor
+    Please add function you need into child class,it well add into public 
+    interface(surely except protected function)
 
+    need override:on_load,un_load(core extension use pass)
+    """
     def __init__(self, interface):
-        self.getElementFromMain = interface
+        self.accessor = interface
 
     def _get_element(self, path):
-        return self.getElementFromMain(path)
+        return self.accessor(path)
 
     def on_load(self, **arg):
         pass
@@ -35,7 +39,6 @@ class BaseInterface(object):
 
     接口有两大工作：1.指向extension让它不要被回收了，2.向外部提供调用接口（绑定事件之类的）
     """
-
     def __init__(self, extension_obj):
         self._extension = extension_obj
         # point to extension's object ,so that it won't disappear
