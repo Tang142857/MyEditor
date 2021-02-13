@@ -18,6 +18,7 @@ VIEWER_FONT = ('宋体', 11)
 BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 FILL_TEXT_FONT = ('Microsoft YaHei', 50)
+LIGHT_BLUE = '#007ACC'
 
 WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'MyEditor'}
 # global variable end
@@ -52,7 +53,7 @@ class MainWidgets(object):
         self.x_structure = tkinter.PanedWindow(self.windows, background='red')
         # self.mainFrame = tkinter.Frame(self.windows)
         self.displayFrame = tkinter.Frame(self.x_structure, width=200, height=50)
-        self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=12)
+        self.statusShowFrame = tkinter.Frame(self.windows, background='#007ACC', height=12)
         self.toolBarFrame = tkinter.Frame(self.x_structure, background='green', width=30)
         # Frame initialize end
 
@@ -79,7 +80,7 @@ class MainWidgets(object):
 
         self.x_structure.pack(fill='both', expand=True)
         self.textViewer.pack(expand=True, fill='both')
-        self.statusLabel.pack(anchor='w', fill='x', expand=True)
+        self.statusLabel.pack(side='left',fill='y')
 
     def fillEmptyText(self, string='No File'):
         """Fill the content view text with a big label with string."""

@@ -124,7 +124,7 @@ def _check(*arg, **args):
     rows = content.split('\n')[:-1]  # split the content row by row,needn't the last row(it is empty!!!)
 
     if arguments['init']:
-        for index, strRow in enumerate(tqdm(rows, ncols=80,desc='Scanning:')):
+        for index, strRow in enumerate(tqdm(rows, ncols=80, desc='Scanning:')):
             _scanRow(index, strRow)
     else:
         _scanRow(nowRowIndex, rows[nowRowIndex])
@@ -136,7 +136,6 @@ def _check(*arg, **args):
 
 class EditMenu(tkinter.Menu):
     """Editor menu bar"""
-
     def __init__(self, master):
         """Master=mainWindowMenu"""
         super().__init__(master, tearoff=False)
@@ -155,11 +154,15 @@ class EditMenu(tkinter.Menu):
 
 class CodeEditor(base.BaseExtension):
     """基本都是直接调用了，直接看函数注释"""
-
     def __init__(self, interface):
         super().__init__(interface)
 
     def on_load(self, **arg):
+        """
+        On load function of core editor
+
+        addition: menu bar,event bind,tags of text viewer(remove these thing when unload)
+        """
         global SELF_UI, SELF_MW, update_status
         SELF_MW = self._get_element('MAIN_WINDOW')
         SELF_UI = self._get_element('UI_WIDGETS')
@@ -168,7 +171,15 @@ class CodeEditor(base.BaseExtension):
         # set self global variables end
 
         self._get_element('MAIN_WINDOW>bind')('<KeyRelease>', _check)
+        self._get_element('UI_WIDGETS>textViewer').event_add("<<set-line-and-column>>", "<KeyRelease>",
+                                                             "<ButtonRelease>")
+        self._get_element('UI_WIDGETS>textViewer').bind('<<set-line-and-column>>', self._update_line_and_column)
         self._get_element('UI_WIDGETS>mainWindowMenu').add_cascade(label='Editor', menu=self._menuBar)
+        self.position_show_label = tkinter.Label(self._get_element('UI_WIDGETS>statusShowFrame'),
+                                                 background='#007ACC',
+                                                 text='Row:0,Col:0',
+                                                 font=('Microsoft YaHei', 9))
+        self.position_show_label.pack(side='right')
         # config main window
 
         _setTags()
@@ -182,6 +193,10 @@ class CodeEditor(base.BaseExtension):
 
     def un_load(self):
         self._get_element('log')('unloading core editor...')
+
+    def _update_line_and_column(self, event=None):
+        r_position, c_position = self._get_element('UI_WIDGETS>textViewer').index('insert').split('.')
+        self.position_show_label.config(text=f'Row:{r_position},Col:{c_position}')
 
     def _checkAll(self):
         _check(init=True)
