@@ -1,5 +1,5 @@
 /.vscode
-
+/.idea
 __pycache__
 /coreElement/__pycache__
 /coreEditor/__pycache__

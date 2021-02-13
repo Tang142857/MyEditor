@@ -15,3 +15,5 @@ extension的核心思想是：（每个）扩展只干一件事，其余交互�
 extension必须继承extensions.base.BaseExtension类，以确保正确重写了每一个需要的函数  
 extension可以并建议在自身目录下生成local.json本地配置文件  
 extension必须具有main模块，并保证含有Extension类，loader通过该类引导插件加载  
+建议扩展事件采用Event类，参数列表为(self,event_args,other arg...)  
+屏幕左侧的tool bar分配给了extension，可以往上面放置组件  

@@ -55,7 +55,7 @@ class BaseDialogBox(tkinter.Toplevel):
 
 class AskQuestionBox(BaseDialogBox):
     def __init__(self, *arg, **args):
-        """Callback normally is loadExtensions"""
+        """Callback normally is load_extensions"""
         super().__init__(*arg, **args)
 
     def returnAnswer(self):

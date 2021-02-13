@@ -19,7 +19,7 @@ BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
 STATUS_FONT = ('Microsoft YaHei', 9)
 FILL_TEXT_FONT = ('Microsoft YaHei', 50)
 
-WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'Text Book Checker'}
+WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'MyEditor'}
 # global variable end
 
 
@@ -29,11 +29,7 @@ class MainWidgets(object):
     """
     def __initEvents__(self):
         """Initialize all events."""
-        self.openWorkDirEvent = mainEvent.OpenWorkDirEvent()
-        self.openEvent = mainEvent.OpenEvent()
-        self.saveEvent = mainEvent.SaveEvent()
         self.copyContentEvent = mainEvent.CopyContentEvent()
-        self.closeFileEvent = mainEvent.CloseFileEvent()
         self.loadExtensionsEvent = mainEvent.LoadExtensionsEvent()
 
     def __init__(self, windows: tkinter.Tk):
@@ -45,23 +41,19 @@ class MainWidgets(object):
 
         self.mainWindowMenu = tkinter.Menu(self.windows)
 
-        fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
-        fileMenu.add_command(label='Open', command=self.openEvent.emit)
-        fileMenu.add_command(label='Save', command=self.saveEvent.emit)
-        fileMenu.add_command(label='Close file', command=self.closeFileEvent.emit)
-        fileMenu.add_separator()
-        fileMenu.add_command(label='Copy', command=self.copyContentEvent.emit)
-        fileMenu.add_command(label='Directory', command=self.openWorkDirEvent.emit)
-        fileMenu.add_separator()
-        fileMenu.add_command(label='Extension', command=self.loadExtensionsEvent.emit)
+        self.fileMenu = tkinter.Menu(self.mainWindowMenu, tearoff=False)
+        self.fileMenu.add_command(label='Copy Content', command=self.copyContentEvent.emit)
+        self.fileMenu.add_separator()
+        self.fileMenu.add_command(label='Manage Extension', command=self.loadExtensionsEvent.emit)
 
-        self.mainWindowMenu.add_cascade(label='File', menu=fileMenu, underline=1)
+        self.mainWindowMenu.add_cascade(label='File', menu=self.fileMenu, underline=1)
         # Menu set end
 
-        self.mainFrame = tkinter.Frame(self.windows)
-        self.displayFrame = tkinter.Frame(self.mainFrame, background='red', width=200, height=50)
+        self.x_structure = tkinter.PanedWindow(self.windows, background='red')
+        # self.mainFrame = tkinter.Frame(self.windows)
+        self.displayFrame = tkinter.Frame(self.x_structure, width=200, height=50)
         self.statusShowFrame = tkinter.Frame(self.windows, background='blue', height=12)
-        self.toolBarFrame = tkinter.Frame(self.windows, background='green', width=30)
+        self.toolBarFrame = tkinter.Frame(self.x_structure, background='green', width=30)
         # Frame initialize end
 
         self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
@@ -79,12 +71,13 @@ class MainWidgets(object):
         # Place the menu.
 
         self.statusShowFrame.pack(side='bottom', fill='x')
-        self.toolBarFrame.pack(side='left', fill='y')
+        self.x_structure.add(self.toolBarFrame)
+        self.x_structure.add(self.displayFrame)
 
-        self.mainFrame.pack(side='top', fill='both', expand=True)
-        self.displayFrame.pack(side='left', fill='both', expand=True)
+        # self.displayFrame.pack(side='left', fill='both', expand=True)
         # Place the frame widget.
 
+        self.x_structure.pack(fill='both', expand=True)
         self.textViewer.pack(expand=True, fill='both')
         self.statusLabel.pack(anchor='w', fill='x', expand=True)
 
