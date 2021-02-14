@@ -1,14 +1,9 @@
 """
-code editor for MyEditor
-@author: tang142857
-Copyright(c) DFSA Software Develop Center
+Core editor for ME,include color and so on
 
-主编辑器函数，提供 关键字高亮，缩进增强，搜索字符串 等服务
-在每次释放键盘<keyRelease>后都执行，尽可能小
-后期支持自定义关键字
-
-TBC extend standard
-都保证包含了：initialize（初始化插件）
+@author: Tang142857
+@file: editor.py ,Create at: 2021-02-14
+Copyright(c): DFSA Software Develop Center
 """
 import json
 import time
@@ -209,12 +204,12 @@ class CodeEditor(base.BaseExtension):
     def _add_signal(self, event=None):
         name = dialog.ask('Add rule', 'Enter new rule.')
         if name is None: return
-        self.add_signal('special_key', name)
+        self.set_signal('add', 'special_key', name)
 
     def _remove_signal(self, event=None):
         name = dialog.ask('Remove rule', 'Enter rule you want to remove.')
         if name is None: return
-        self.remove_signal('special_key', name)
+        self.set_signal('remove', 'special_key', name)
 
     # ########################## protected member functions end ##########################
     # following are the puublic member function
@@ -223,18 +218,14 @@ class CodeEditor(base.BaseExtension):
     def check(self, *arg, **args):
         _check(*arg, **args)
 
-    def add_signal(self, kind: str, obj):
+    def set_signal(self, method='add', kind: str, obj):
         """Add signal."""
         try:
-            PUNCTUATION[kind].append(obj)
-            return None
-        except Exception as msg:
-            return msg
+            if method == 'add':
+                PUNCTUATION[kind].append(obj)
+            elif method == 'remove':
+                PUNCTUATION[kind].remove(obj)
 
-    def remove_signal(self, kind: str, obj):
-        """Remove signal"""
-        try:
-            PUNCTUATION[kind].remove(obj)
             return None
         except Exception as msg:
             return msg

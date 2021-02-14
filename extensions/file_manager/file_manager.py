@@ -2,7 +2,8 @@
 file serve model for ME
 
 @author: Tang142857
-Copyright(c) DFSA Software Develop Center
+@file: file_manager.py ,Create at: 2021-02-14
+Copyright(c): DFSA Software Develop Center
 """
 import os
 import tkinter.filedialog

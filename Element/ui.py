@@ -1,9 +1,9 @@
 """
-text book checker ui configure file
-@author: tang142857
-Copyright(c) DFSA Software Develop Center
+UI widgets for main apply
 
-All ui objects need father widgets,they will set ui in __init__ function
+@author: Tang142857
+@file: ui.py ,Create at: 2021-02-14
+Copyright(c): DFSA Software Develop Center
 """
 import tkinter
 import tkinter.scrolledtext
