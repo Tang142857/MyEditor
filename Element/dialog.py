@@ -1,5 +1,5 @@
 """
-dialog function for apply,use 'dilog>func_name' to call or diectly import Element.dialog
+dialog function for apply,use 'dialog>func_name' to call or directly import Element.dialog
 
 @author: tang142857
 Copyright(c) DFSA Software Develop Center
@@ -8,35 +8,49 @@ Copyright(c) DFSA Software Develop Center
 import tkinter
 import tkinter.filedialog
 import tkinter.ttk
-# from typing import Callable
 
 COMMON = ('Microsoft YaHei', 12)
 DES = ('Microsoft YaHei', 10)
 
 
+class Answer(object):
+    """Answer class ,to save the answer and share it with other object"""
+
+    def __init__(self, value=None):
+        self.answer_str = value
+
+    def get(self):
+        return self.answer_str
+
+    def set(self, new_value: str):
+        self.answer_str = new_value
+
+
 class DescribedEntry(tkinter.Frame):
-    """An entry with describ"""
+    """An entry with describe"""
+
     def __init__(self, master, des: str, **entry_args):
         super().__init__(master)
-        self.describ_label = tkinter.Label(self, text=des, font=DES)
+        self.describe_label = tkinter.Label(self, text=des, font=DES)
         self.entry = tkinter.Entry(self, **entry_args)
 
     def pack_(self, **args):  # 不能重名
         self.pack(**args)
-        self.describ_label.pack(side='left', fill='y')
+        self.describe_label.pack(side='left', fill='y')
         self.entry.pack(side='left', fill='y')
 
 
 class DescribedCombobox(tkinter.Frame):
-    """只提供了[]运算符向combobox的传参，其他请使用object_name.combobox.func"""
+    """只提供了[]运算符向combobox的传参，其他请使用object_name.choice_box.func"""
+
     def __init__(self, master, des: str, **combobox_args):
         super().__init__(master)
-        self.describ_label = tkinter.Label(self, text=des)
+        self.describe_label = tkinter.Label(self, text=des)
         self.combobox = tkinter.ttk.Combobox(self, **combobox_args)
 
     def pack_(self, **args):  # 不能重名
         self.pack(**args)
-        self.describ_label.pack(side='left', fill='y')
+        self.describe_label.pack(side='left', fill='y')
         self.combobox.pack(side='left', fill='y')
 
     def __getitem__(self, index):
@@ -47,43 +61,44 @@ class DescribedCombobox(tkinter.Frame):
 
 
 class BaseDialogBox(tkinter.Toplevel):
-    """Basical widgets the ask dialog box need"""
+    """Basic widgets the ask dialog box need"""
+
     def __init__(self, title, message, **args):
+        """
+        Initialize function of BaseDialogBox
+        :param title: the title of the box
+        :param message: message you want to show
+        :param args: user_answer:Answer
+        """
         super().__init__()
         self.titleName = title
         self.message = message
-        self.args = {'des': 'name:'}
-
+        self.args = {'des': 'Name:'}
         self.args.update(args)
+        # create widgets
+        self.message_box = tkinter.Label(self, text=self.message, font=COMMON)
+        self.answer = tkinter.StringVar()
+        self.entrance = DescribedEntry(self, self.args['des'], textvariable=self.answer, font=COMMON)
+        self.sure_button = tkinter.Button(self, text='Sure', command=self.return_answer)
+        self.cancel_button = tkinter.Button(self, text='Cancel', command=self.exit_window)
+        # pack message box first,maybe you need add more widgets in it
+        self.message_box.pack()
 
     def setup(self):
         """Setup widgets"""
         self.title(self.titleName)
 
-        self.message = tkinter.Label(self, text=self.message, font=COMMON)
-        self.answer = tkinter.StringVar()
-        self.entrance = DescribedEntry(self, self.args['des'], textvariable=self.answer, font=COMMON)
-        self.okButton = tkinter.Button(self, text='Sure', command=self.return_answer)
-        self.cancelButton = tkinter.Button(self, text='Cancel', command=self.exit_window)
-
-        self.message.pack()
-
         self.protocol('WM_DELETE_WINDOW', self.exit_window)
-        self.__place_widgets()
-        self._show()
-
-    def __place_widgets(self):
-        """Place the widgets,you may need override this function to have a better appearance"""
         self.entrance.pack_()
-        self.okButton.pack(side='left', padx=5)
-        self.cancelButton.pack(side='left', padx=5)
+        self.sure_button.pack(side='left', padx=5)
+        self.cancel_button.pack(side='left', padx=5)
 
-    def _show(self):
         self.mainloop()
 
     def return_answer(self):
-        """Override the function to get answer"""
-        return self.answer.get()
+        """Override the function to get answer,and do not forget exit_window"""
+        print(f'Default return_answer function ,answer {self.answer.get()}')
+        self.exit_window()
 
     def exit_window(self):
         self.quit()
@@ -95,57 +110,48 @@ class AskQuestionBox(BaseDialogBox):
         super().__init__(*arg, **args)
 
     def return_answer(self):
-        self.args['callback'](name=self.answer.get())
+        self.args['user_answer'].set(self.answer.get())
         self.exit_window()
 
 
 class AskKeyValueBox(BaseDialogBox):
     def __init__(self, *arg, **args):
+        """
+        :param args: title: the title of the box,message: message you want to show
+        user_key:Answer,user_answer:Answer
+        """
         super().__init__(*arg, **args)
-        self.combobox = DescribedCombobox(self, 'Key')
-        self.combobox['values'] = self.args['choice']
+        self.choice_box = DescribedCombobox(self, 'Key')
+        self.choice_box['values'] = self.args['choice']
+        self.choice_box.pack_()
 
     def return_answer(self):
-        pass
-
-    def __place_widgets(self):
-        self.combobox.pack_()
-        self._Class__place_widgets()
+        key, answer_str = self.choice_box.combobox.get(), self.answer.get()
+        self.args['user_key'].set(key)
+        self.args['user_answer'].set(answer_str)
+        self.exit_window()
 
 
 def ask(title: str, message: str):
-    def get_answer(name: str):
-        global answer
-        answer = name
-
-    AskQuestionBox(title, message, callback=get_answer).setup()
-    try:
-        return answer
-    except NameError:
-        return None
+    user_answer = Answer()
+    AskQuestionBox(title, message, user_answer=user_answer).setup()
+    return user_answer.get()
 
 
 def ask_key_value(title: str, message: str, choice: list):
-    def get_answer(key_, value_):
-        global key, value
-        key, value = key_, value_
-
-    AskKeyValueBox(title, message, choice=choice).setup()
-
-    try:
-        return key, value
-    except NameError:
-        return None, None
+    user_key, user_answer = Answer(), Answer()
+    AskKeyValueBox(title, message, choice=choice, user_key=user_key, user_answer=user_answer).setup()
+    return user_key.get(), user_answer.get()
 
 
 def ask_extension_name():
     return ask('Load extension', 'Enter extension\'s name')
 
 
-def test_KV():
+def test_():
     return ask_key_value('t', 't', ['1', '2'])
 
 
 if __name__ == '__main__':
     print(ask_extension_name())
-    print(test_KV())
+    print(test_())
