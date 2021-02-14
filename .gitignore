@@ -7,7 +7,6 @@ __pycache__
 *.code-workspace
 Thumbs.db
 *.pyc
-/resource
 
 debug.*
 local.*

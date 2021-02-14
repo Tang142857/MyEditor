@@ -15,7 +15,7 @@ import time
 import tkinter
 from tqdm import tqdm
 
-from Element import mainEvent, dialog
+from Element import main_event, dialog, share_memory
 from extensions import base
 from extensions.core_editor import findTool
 
@@ -139,10 +139,10 @@ class EditMenu(tkinter.Menu):
         """Master=mainWindowMenu"""
         super().__init__(master, tearoff=False)
         # initialize father widget
-        self.conutPress = mainEvent.Event()
-        self.checkAllPreaa = mainEvent.Event()
-        self.addRulePress = mainEvent.Event()
-        self.removeRulePress = mainEvent.Event()
+        self.conutPress = main_event.Event()
+        self.checkAllPreaa = main_event.Event()
+        self.addRulePress = main_event.Event()
+        self.removeRulePress = main_event.Event()
         # create signal
 
         self.add_command(label='Conut', command=self.conutPress.emit)
@@ -174,7 +174,7 @@ class CodeEditor(base.BaseExtension):
         SELF_UI.textViewer.bind('<<set-line-and-column>>', self._update_line_and_column)
         SELF_UI.mainWindowMenu.add_cascade(label='Editor', menu=self._menuBar)
         self.position_show_label = tkinter.Label(SELF_UI.statusShowFrame,
-                                                 background='#007ACC',
+                                                 background=share_memory.CONFIG['light_blue'],
                                                  text='Row:1,Col:0',
                                                  font=('Microsoft YaHei', 9))
         self.position_show_label.pack(side='right')

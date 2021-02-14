@@ -8,7 +8,7 @@ import os
 import tkinter.filedialog
 import tkinter.messagebox
 
-from Element.mainEvent import Event
+from Element.main_event import Event
 from extensions import base
 
 

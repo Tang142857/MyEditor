@@ -25,14 +25,14 @@ textbookchecker
 │  README.md  
 │  
 ├─Element--(核心元素模块)  
-│  │  mainEvent.py--(主要事件)  
+│  │  main_event.py--(主要事件)  
 │  │  ui.py--(用户界面)  
 │  │  __init__.py  
 
 ## 框架
 apply作为主程序，管理核心事件，负责加载所有的模块  
 UI内部提供交互事件关联到apply中的处理函数，作为单独的模块被加载  
-主要事件存放在mainEvent，一般只有apply使用（其他绑定用接口绑定）  
+主要事件存放在main_event，一般只有apply使用（其他绑定用接口绑定）  
 其他服务插件提供
 
 [Extension README](extensions/README.md)

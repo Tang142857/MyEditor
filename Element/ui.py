@@ -9,19 +9,9 @@ import tkinter
 import tkinter.scrolledtext
 
 try:
-    from Element import mainEvent
+    from Element import main_event, share_memory
 except ImportError:  # to test the model only
-    import mainEvent
-
-COMMON_FONT = ('宋体', 12)
-VIEWER_FONT = ('宋体', 11)
-BORDER_STYLE = {'borderwidth': 4, 'relief': 'raise'}
-STATUS_FONT = ('Microsoft YaHei', 9)
-FILL_TEXT_FONT = ('Microsoft YaHei', 50)
-LIGHT_BLUE = '#007ACC'
-
-WINDOWS_CONFIG = {'position': '700x360+355+200', 'init_title': 'MyEditor'}
-# global variable end
+    import main_event
 
 
 class MainWidgets(object):
@@ -30,14 +20,14 @@ class MainWidgets(object):
     """
     def __initEvents__(self):
         """Initialize all events."""
-        self.copyContentEvent = mainEvent.CopyContentEvent()
-        self.loadExtensionsEvent = mainEvent.LoadExtensionsEvent()
+        self.copyContentEvent = main_event.CopyContentEvent()
+        self.loadExtensionsEvent = main_event.LoadExtensionsEvent()
 
     def __init__(self, windows: tkinter.Tk):
         self.__initEvents__()
         self.windows = windows
-        self.windows.geometry(WINDOWS_CONFIG['position'])
-        self.windows.title(WINDOWS_CONFIG['init_title'])
+        self.windows.geometry(share_memory.CONFIG['window_config']['position'])
+        self.windows.title(share_memory.CONFIG['window_config']['init_title'])
         # Set window attribute end
 
         self.mainWindowMenu = tkinter.Menu(self.windows)
@@ -53,17 +43,18 @@ class MainWidgets(object):
         self.x_structure = tkinter.PanedWindow(self.windows, background='red')
         # self.mainFrame = tkinter.Frame(self.windows)
         self.displayFrame = tkinter.Frame(self.x_structure, width=200, height=50)
-        self.statusShowFrame = tkinter.Frame(self.windows, background='#007ACC', height=12)
+        self.statusShowFrame = tkinter.Frame(self.windows, background=share_memory.CONFIG['light_blue'], height=12)
         self.toolBarFrame = tkinter.Frame(self.x_structure, background='green', width=30)
         # Frame initialize end
 
-        self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=VIEWER_FONT)
+        self.textViewer = tkinter.scrolledtext.ScrolledText(self.displayFrame, font=share_memory.CONFIG['viewer_font'])
         self.statusLabel = tkinter.Label(self.statusShowFrame,
                                          text='Status',
-                                         font=STATUS_FONT,
+                                         font=share_memory.CONFIG['status_font'],
                                          anchor='w',
                                          background='#007ACC')
-        self.fillEmptyLabel = tkinter.Label(self.displayFrame, font=FILL_TEXT_FONT)  # A label to fill text
+        self.fillEmptyLabel = tkinter.Label(self.displayFrame,
+                                            font=share_memory.CONFIG['fill_text_font'])  # A label to fill text
         # Widget initialize end
         self.applyWidgets()
 
@@ -80,7 +71,7 @@ class MainWidgets(object):
 
         self.x_structure.pack(fill='both', expand=True)
         self.textViewer.pack(expand=True, fill='both')
-        self.statusLabel.pack(side='left',fill='y')
+        self.statusLabel.pack(side='left', fill='y')
 
     def fillEmptyText(self, string='No File'):
         """Fill the content view text with a big label with string."""
