@@ -9,7 +9,8 @@ import os
 import tkinter.filedialog
 import tkinter.messagebox
 
-from Element.main_event import Event
+import exceptions
+from Element import main_event, dialog
 from extensions import base
 
 
@@ -50,9 +51,8 @@ class TextFile(object):
 
         try:
             self.strFile = self.bitFile.decode(encoding='utf-8')
-        except BaseException as msg:  # I really don't know what is the exception's name
+        except UnicodeDecodeError as msg:
             tkinter.messagebox.showerror('Open error:decode!!!', msg)
-            raise exceptions.OpenFileException('Can not decode the file ,please check decode.')
 
     def save(self, encoding='utf-8'):
         """Save the file with path"""
@@ -91,10 +91,10 @@ class ManagerMenu(object):
     """此类不一样，附着在file目录下，不需要继承tkinter.menu"""
     def __init__(self, master):
         self._master = master
-        self.open_file_event = Event()
-        self.write_file_event = Event()
-        self.open_directory_event = Event()
-        self.close_file_event = Event()
+        self.open_file_event = main_event.Event()
+        self.write_file_event = main_event.Event()
+        self.open_directory_event = main_event.Event()
+        self.close_file_event = main_event.Event()
         # create event
         self._master.add_separator()
         self._master.add_command(label='Open File', command=self.open_file_event.emit)
@@ -146,14 +146,15 @@ class Manager(base.BaseExtension):
         log('Saved file.')
 
     def close_file(self, event):
-        """关闭文件，锁定viewer"""
+        """关闭文件"""
         try:
             self._file.close()
-        except BaseException as msg:
-            print(msg)
-
-        self._get_element('UI_WIDGETS').fillEmptyText()
-        log('Close file.')
+        except AttributeError as msg:
+            pass  # 多半是在没有打开文件的情况下open，没有上一个文件可关闭
+        finally:
+            self._file = None
+            self._get_element('UI_WIDGETS').fillEmptyText()
+            log('Close file.')
 
     def go_directory(self, event):
         directory_path = self._file.dir()

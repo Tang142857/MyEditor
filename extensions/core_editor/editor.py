@@ -14,8 +14,22 @@ from Element import main_event, dialog, share_memory
 from extensions import base
 from extensions.core_editor import findTool
 
+# class KeywordsDictionary:
+#     def __init__(self):
+#         self.PUNCTUATION = {
+#             "special_key": ["#", "小说", "·", "：", ":", "电子书"],
+#             "key_word": [],
+#             "special_range": [["'", "'", False], ["\"", "\"", False], ["[", "]", True]],
+#             "say_signal": [["“", "”", True], ["‘", "’", True]]
+#         }
+#     def __getitem__(self,index):
+#         return self.PUNCTUATION[index]
+#     def __setitem__(self,index,value):
+#         self.PUNCTUATION[index]=value
+#     def __
+
 PUNCTUATION = {
-    "special_key": ["a", "#", "小说", "·", "：", ":", "电子书"],
+    "special_key": ["#", "小说", "·", "：", ":", "电子书"],
     "key_word": [],
     "special_range": [["'", "'", False], ["\"", "\"", False], ["[", "]", True]],
     "say_signal": [["“", "”", True], ["‘", "’", True]]
@@ -219,12 +233,19 @@ class CodeEditor(base.BaseExtension):
         _check(*arg, **args)
 
     def set_signal(self, method: str, kind: str, obj):
-        """Set signal.Use add or remove as method."""
+        """
+        Set signal.Use add or remove as method.
+        also support use update to reset all the PUNCTUATION ,please make the obj is complete
+        """
         try:
             if method == 'add':
                 PUNCTUATION[kind].append(obj)
             elif method == 'remove':
                 PUNCTUATION[kind].remove(obj)
+            elif method == 'update':
+                print('WARNING: you are reset all the PUNCTUATION')
+                PUNCTUATION.clear()
+                PUNCTUATION.update(obj)
 
             return None
         except Exception as msg:

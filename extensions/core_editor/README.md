@@ -14,6 +14,7 @@ PUNCTUATION = {
 # I suggest you add special_range's signal to special_key,that you can know the wrong signals
 # wrong signals can not be selected and colored,it well still high-light
 ```
+使用set_signal接口可以设置这些关键字，在编写新扩展时可以直接使用editor的高亮引擎  
 
 # findTool:
 findTool为代码编辑器提供了查找功能，使用类似于正则表达式的有限状态机进行查找。
