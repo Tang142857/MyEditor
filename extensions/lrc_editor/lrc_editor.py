@@ -10,6 +10,7 @@ import tkinter.messagebox
 
 from extensions import base
 from extensions.lrc_editor import music_serve
+from extensions.core_editor.editor import _color
 from Element import main_event
 
 LRC_PUNCTUATION = {
@@ -18,6 +19,34 @@ LRC_PUNCTUATION = {
     "special_range": [["[", "]", True]],
     "say_signal": []
 }  # need to reset the key words
+
+
+class Tag(object):
+    def __init__(self, master: tkinter.scrolledtext, lint):
+        self.row_number = 1
+        self.master = master
+        self.lint = lint
+        self.master.tag_config('selected', background='yellow')
+
+    def up_row(self, event=None):
+        if self.row_number - 1 > 0:
+            self.row_number -= 1
+        last_row_number = self.row_number + 1
+        self.lint(row_index=last_row_number - 1)
+        self._update_color()
+
+    def down_row(self, event=None):
+        if self.row_number + 1 < len(self.master.get('1.0', 'end').split('\n')):
+            self.row_number += 1
+        last_row_number = self.row_number - 1
+        self.lint(row_index=last_row_number - 1)
+        self._update_color()
+
+    def _update_color(self):
+        content = self.master.get('1.0', 'end').split('\n')[self.row_number - 1]
+        bracket_end_mark = content.find(']') + 1
+        area_length = len(content) - bracket_end_mark
+        _color((self.row_number - 1, bracket_end_mark, area_length), 'selected')
 
 
 def _translate(num_time):
@@ -83,11 +112,16 @@ class LrcEditor(base.BaseExtension):
         core_editor_interface = self._get_element('extension_interfaces>core_editor')
         core_editor_interface.set_signal('update', None, LRC_PUNCTUATION)
         # reset the key words ,end
+        self.tag = Tag(self._get_element('UI_WIDGETS>textViewer'),
+                       self._get_element('extension_interfaces>core_editor>check'))
+
         self.terminal = CommandBox(self._get_element('MAIN_WINDOW'))
         # Toplevel widget can not call mainloop,I don't know why,but if you call,there will be something wrong
         self.terminal.choose_music_event.add_callback(self._choose_music)
         self.terminal.start_play_event.add_callback(self._start_play)
         self.terminal.stop_play_event.add_callback(self._stop_play)
+        self.terminal.up_select_tag_event.add_callback(self.tag.up_row)
+        self.terminal.down_select_tag_event.add_callback(self.tag.down_row)
 
     def un_load(self):
         pass

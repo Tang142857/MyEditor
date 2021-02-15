@@ -52,7 +52,7 @@ console_log = None
 def _color(positionList: list, kind: str):
     """
     color the string with marks.\n
-    required arguments:positionList[row,startindex,length],kind: mark name
+    required arguments:positionList[row index,start index,length],kind: mark name
     attention: all argments use index(start at 0)!!!
     """
     row_index = positionList[0]
@@ -120,7 +120,7 @@ def _setTags():
 
 def _check(*arg, **args):
     """check content (not noly for code,but also for novel or .lrc and so on)."""
-    arguments = {'init': False}
+    arguments = {'init': False, 'row_index': None}
     arguments.update(args)
     startTime = time.time()
 
@@ -134,6 +134,8 @@ def _check(*arg, **args):
     if arguments['init']:
         for index, strRow in enumerate(tqdm(rows, ncols=80, desc='Scanning:')):
             _scanRow(index, strRow)
+    elif arguments['row_index'] is not None:
+        _scanRow(arguments['row_index'], rows[arguments['row_index']])
     else:
         _scanRow(nowRowIndex, rows[nowRowIndex])
 
