@@ -35,10 +35,12 @@ class Event(object):
         assert callable(func), 'ERROR_IS_NOT_CALLABLE'
         self.callback_functions.append(func)
 
-    def emit(self, **args):
+    def emit(self, *arg, **args):
         # TODO async rewrite
-        for arg in args:
-            setattr(self.event_args, arg, args[arg])
+        for argument in arg:
+            setattr(self.event_args, 'emit_arg', argument)
+        for argument in args:
+            setattr(self.event_args, argument, args[argument])
         self._call()
 
     def _call(self):

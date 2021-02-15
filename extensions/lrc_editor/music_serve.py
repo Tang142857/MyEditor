@@ -14,10 +14,16 @@ import threading
 from time import sleep
 
 
+class PlayError(Exception):
+    def __init__(self, time_code, message):
+        self.time_code = time_code
+        self.message = message
+
+
 class Music(threading.Thread):
     STOP_FLAG = False
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, callback=None):
         assert os.path.isfile(path), 'Not a file'
 
         super().__init__()
@@ -34,6 +40,7 @@ class Music(threading.Thread):
                 tkinter.messagebox.showerror('Music open wrong',
                                              'FFmpeg can not decode the file,please change it to wav by yourself.')
             self._load_file(new_flie_name)
+        self.callback = callback
 
     def _load_file(self, path):
         self.wave_file = wave.open(path, 'rb')
@@ -42,24 +49,22 @@ class Music(threading.Thread):
                                              channels=self.wave_file.getnchannels(),
                                              rate=self.wave_file.getframerate(),
                                              output=True)
-        self.pointer = 0
 
-    def play_async(self, step_length=1024, continue_=False):
-        self.STOP_FLAG=False
-        if continue_: self.pointer = 0
-        frame = self.wave_file.readframes(self.pointer)
+    def play_async(self, step_length=1024):
+        self.STOP_FLAG = False
         # move the pointer to proper position
 
         while frame := self.wave_file.readframes(step_length):
             self.output_stream.write(frame)
-            self.pointer += step_length
             if self.STOP_FLAG: return
-    
+        self.wave_file.setpos(0)  # 指针归位
+
     def stop(self):
-        self.STOP_FLAG=True
+        self.STOP_FLAG = True
 
     def run(self, *arg, **args):
         self.play_async(*arg, **args)
+        if self.callback is not None: self.callback()
         super().__init__()
 
     def close(self):
@@ -71,11 +76,12 @@ class Music(threading.Thread):
 
 if __name__ == '__main__':
     import time
-    m = Music('E:/PY/base_test/scrLet.wav')
+    m = Music('E:/PY/base_test/program_1/test_sound.wav')
     m.start()
     time.sleep(3)
     m.stop()
     time.sleep(2)
     m.start()
-    time.sleep(5)
+    time.sleep(40)
+    m.start()
     m.close()

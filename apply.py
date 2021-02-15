@@ -17,7 +17,7 @@ from Element import ui, dialog
 from extensions.base import manage
 
 sys.path.append(os.getcwd())  # reset the 'include path' the load the extend
-RUN_ONCE = ['file_manager', 'core_editor']  # 立刻加载的插件，一般是ME的基础插件
+RUN_ONCE = ['file_manager', 'core_editor', 'lrc_editor']  # 立刻加载的插件，一般是ME的基础插件
 
 
 class TopInterface(object):
@@ -84,6 +84,7 @@ def load_extensions(name=''):
         setattr(extension_interfaces, name, extension_interface)
         log(f'Activating the extension {name}...')
         get_element(f'extension_interfaces>{name}').on_load()
+        print(f'Load extension {name} done!')
     else:
         log(f'Load {name} extension failed.')
 
