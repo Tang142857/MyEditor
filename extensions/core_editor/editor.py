@@ -218,8 +218,8 @@ class CodeEditor(base.BaseExtension):
     def check(self, *arg, **args):
         _check(*arg, **args)
 
-    def set_signal(self, method='add', kind: str, obj):
-        """Add signal."""
+    def set_signal(self, method: str, kind: str, obj):
+        """Set signal.Use add or remove as method."""
         try:
             if method == 'add':
                 PUNCTUATION[kind].append(obj)
