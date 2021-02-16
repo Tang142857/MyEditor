@@ -67,6 +67,10 @@ class Music(threading.Thread):
         if self.callback is not None: self.callback()
         super().__init__()
 
+    def get_time(self):
+        time = self.wave_file.tell() / self.wave_file.getframerate()
+        return round(time, 2)
+
     def close(self):
         self.output_stream.stop_stream()
         self.wave_file.close()

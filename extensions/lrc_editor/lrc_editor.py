@@ -2,7 +2,8 @@
 Lrc edit extension for ME
 
 @author: Tang142857
-Copyright(c) DFSA Software Develop Center
+@file: lrc_editor.py ,Create at: 2021-02-15
+Copyright(c): DFSA Software Develop Center
 """
 import tkinter
 import tkinter.filedialog
@@ -22,10 +23,11 @@ LRC_PUNCTUATION = {
 
 
 class Tag(object):
-    def __init__(self, master: tkinter.scrolledtext, lint):
+    def __init__(self, master, lint, time_line):
         self.row_number = 1
         self.master = master
         self.lint = lint
+        self.time_line = time_line
         self.master.tag_config('selected', background='yellow')
 
     def up_row(self, event=None):
@@ -42,6 +44,16 @@ class Tag(object):
         self.lint(row_index=last_row_number - 1)
         self._update_color()
 
+    def add_tag_head(self, event=None):
+        """行头添加时间码，把标签移到下一行"""
+        # content = self.master.get(f'{self.row_number}.0', 'end').split('\n')[0]
+        # # get now row content
+        # self.master.mark_set('insert', f'{self.row_number}.{len(content)+1}')
+        # move to the end
+        self.master.mark_set('insert', f'{self.row_number}.0')
+        self.master.insert('insert', f'[{_translate(self.time_line())}]')
+        self.down_row()
+
     def _update_color(self):
         content = self.master.get('1.0', 'end').split('\n')[self.row_number - 1]
         bracket_end_mark = content.find(']') + 1
@@ -51,7 +63,7 @@ class Tag(object):
 
 def _translate(num_time):
     """Translate number time to str time"""
-    minutes, remain_time = int_time // 60, int_time % 60
+    minutes, remain_time = num_time // 60, num_time % 60
     str_minute, str_second = map(str, (round(minutes), round(remain_time, 2)))
     str_second = (str_second.split('.')[0].rjust(2, '0'), str_second.split('.')[1].ljust(2, '0'))
     str_time = str_minute.rjust(2, '0') + f':{str_second[0]}.{str_second[1]}'
@@ -70,7 +82,7 @@ class CommandBox(tkinter.Toplevel):
         self.down_select_tag_event = main_event.Event()
         self.choose_music_event = main_event.Event()
 
-        self.name_show = tkinter.Label(self, text='Music Name')
+        self.name_show = tkinter.Label(self, text='Click me to select music')
 
         self.play_control_frame = tkinter.Frame(self)
         self.start_play_button = tkinter.Button(self.play_control_frame,
@@ -113,7 +125,7 @@ class LrcEditor(base.BaseExtension):
         core_editor_interface.set_signal('update', None, LRC_PUNCTUATION)
         # reset the key words ,end
         self.tag = Tag(self._get_element('UI_WIDGETS>textViewer'),
-                       self._get_element('extension_interfaces>core_editor>check'))
+                       self._get_element('extension_interfaces>core_editor>check'), self._get_time)
 
         self.terminal = CommandBox(self._get_element('MAIN_WINDOW'))
         # Toplevel widget can not call mainloop,I don't know why,but if you call,there will be something wrong
@@ -122,6 +134,7 @@ class LrcEditor(base.BaseExtension):
         self.terminal.stop_play_event.add_callback(self._stop_play)
         self.terminal.up_select_tag_event.add_callback(self.tag.up_row)
         self.terminal.down_select_tag_event.add_callback(self.tag.down_row)
+        self.terminal.add_tag_event.add_callback(self._add_tag)
 
     def un_load(self):
         pass
@@ -134,6 +147,12 @@ class LrcEditor(base.BaseExtension):
         if not bool(file_path): return
         self.music_file = music_serve.Music(file_path, self._release_button)
         self.terminal.name_show.config(text=file_path)
+
+    def _add_tag(self, event=None):
+        self.tag.add_tag_head()
+
+    def _get_time(self, event=None):
+        return self.music_file.get_time()
 
     def _start_play(self, event=None):
         try:
