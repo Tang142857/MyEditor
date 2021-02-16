@@ -9,7 +9,7 @@ Copyright(c): DFSA Software Develop Center
 CONFIG={
     'light_blue':'#007ACC',
     'common_font':['宋体', 12],
-    'viewer_font':['宋体', 11],
+    'viewer_font':['consolas', 11],
     'status_font':['Microsoft YaHei', 9],
     'fill_text_font':['Microsoft YaHei', 50],
     'border_style':{'borderwidth': 4, 'relief': 'raise'},
