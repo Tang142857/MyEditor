@@ -2,7 +2,9 @@
 共享内存空间，利用Python加载模块的特殊性，即只传递模块对象的引用而非实例
 
 @author: Tang142857
-@file: share_memory.py ,Create at: 2021-02-14
+@project: MyEditor
+@file: share_memory.py
+@date: 2021-02-22
 Copyright(c): DFSA Software Develop Center
 """
 

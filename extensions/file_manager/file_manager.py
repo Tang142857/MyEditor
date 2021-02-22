@@ -2,89 +2,98 @@
 file serve model for ME
 
 @author: Tang142857
-@file: file_manager.py ,Create at: 2021-02-14
+@project: MyEditor
+@file: file_manager.py
+@date: 2021-02-22
 Copyright(c): DFSA Software Develop Center
 """
 import os
+from hashlib import md5
 import tkinter.filedialog
 import tkinter.messagebox
 
 import exceptions
-from Element import main_event, dialog
+from Element import main_event, dialog, share_memory
 from extensions import base
 
 
 class TextFile(object):
     """文本文件类，用于打开，保存文件，以及储存文件状态（替代RUN_STATUS）和更多文件服务"""
-    def __init__(self, ui, main_window, is_new=True, path='Untitled.txt'):
+    def __init__(self, ui, is_new=True, path='Untitled.txt'):
         """
         初始化文件
         is_new: 是否创建新文件，默认创建新文件
         path: 若读取文件，需要传入path，创建的新文件没有path（None），保存时报错
+
+        First save the path ,even it is untitled ,untitled file path is none.
+        Second ,create bit file ,str file ,save ui's pointer.
         """
         self.path = path
-        self.isSave = False
 
-        self.bitFile = None
-        self.strFile = None
+        self.bit_file = 0x0000
+        self.str_file = str()
         self.ui = ui
-        self.main_window = main_window
         # create variables end
         if is_new is False:
             self.__load_file()
-            self.ui.textViewer.insert('1.0', self.strFile)
         else:
             log('Create empty file.')
 
+        self.push()
         self.ui.relieveEmptyText()
-        self.main_window.title(f'MyEditor - {self.path}')
 
     def __load_file(self):
-        """Mark sure file is real,and read it into self.bitfile,self.strfile"""
-        if (self.path is None) or (not os.path.isfile(self.path)):
-            self.path = tkinter.filedialog.askopenfilename(title='Open new file')
-            if self.path == '':
-                raise exceptions.OpenFileException('User has not choose a file.')  # user choose 'cancel'
-
         with open(self.path, 'rb') as f:
-            self.bitFile = f.read()  # open with bin for encode after load
+            self.bit_file = f.read()  # open with bin for encode after load
 
         try:
-            self.strFile = self.bitFile.decode(encoding='utf-8')
+            self.str_file = self.bit_file.decode(encoding='utf-8')
         except UnicodeDecodeError as msg:
-            tkinter.messagebox.showerror('Open error:decode!!!', msg)
+            tkinter.messagebox.showwarning('Encoding',
+                                           'File is opened ,but encoding is not utf-8 ,please check and reload.')
+            self.str_file = str(self.bit_file)
 
-    def save(self, encoding='utf-8'):
-        """Save the file with path"""
-        content = self.ui.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
+    def write(self, path=None, encoding='utf-8'):
+        """Write self.str_file to disk"""
+        if path is not None:
+            pass
+        else:
+            path = self.path
 
-        if self.path == 'Untitled.txt':
-            self.path = tkinter.filedialog.asksaveasfilename(title='Save new file')
-            if self.path == '':
-                return  # user choose cancel
+        if not os.path.isfile(path):
+            path = tkinter.filedialog.askopenfilename()
+            if not bool(path): return  # the user press cancel
 
-        with open(self.path, 'wb') as f:
-            f.write(content.encode(encoding))
-            self.strFile = content  # update memory
-        self.isSave = True
+        with open(path, 'wb') as f:
+            self.bit_file = self.str_file.encode(encoding)
+            f.write(self.bit_file)
 
     def close(self):
-        """Make sure file is saved"""
-        if self.isSave is False:
-            ans = tkinter.messagebox.askyesno('Save', 'File has not saved,save it right now?\n文件未保存，保存？')
-            if ans:
-                self.save()  # save file
-
-        del self.bitFile, self.strFile, self.path, self.isSave
+        """release objects ,fill window ,and clean viewer"""
+        del self.bit_file, self.str_file, self.path, self.ui
         self.ui.textViewer.delete('1.0', 'end')
-
         self.ui.fillEmptyText()
-        self.main_window.title('MyEditor')
 
     def dir(self):
         """Return file's work dir."""
         directory_path = '/'.join(self.path.split('/')[:-1])
         return directory_path
+
+    def push(self):
+        """Push now str file to viewer"""
+        self.ui.textViewer.delete('1.0', 'end')
+        self.ui.textViewer.insert('insert', self.str_file)
+
+    def pull(self):
+        """Pull viewer's file to self.str_file"""
+        content = self.ui.textViewer.get('1.0', 'end')[:-1]  # need not the last \n
+        self.str_file = content
+
+    def compare(self):
+        """Compare viewer's file and self.str_file"""
+        self_md5 = md5(self.str_file.encode('utf-8')).hexdigest()
+        viewer_md5 = md5((self.ui.textViewer.get('1.0', 'end')[:-1]).encode('utf-8')).hexdigest()
+        return viewer_md5 == self_md5
 
 
 class ManagerMenu(object):
