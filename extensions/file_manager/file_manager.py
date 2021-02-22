@@ -35,14 +35,14 @@ class TextFile(object):
         self.ui = ui
         # create variables end
         if is_new is False:
-            self.__load_file()
+            self._load_file()
         else:
             log('Create empty file.')
 
         self.push()
         self.ui.relieveEmptyText()
 
-    def __load_file(self):
+    def _load_file(self):
         with open(self.path, 'rb') as f:
             self.bit_file = f.read()  # open with bin for encode after load
 
@@ -60,19 +60,21 @@ class TextFile(object):
         else:
             path = self.path
 
-        if not os.path.isfile(path):
-            path = tkinter.filedialog.askopenfilename()
+        if not os.path.isdir('/'.join(path.split('/')[:-1])):
+            path = tkinter.filedialog.asksaveasfilename()
             if not bool(path): return  # the user press cancel
 
         with open(path, 'wb') as f:
+            # update bit file ,file path ,write file
             self.bit_file = self.str_file.encode(encoding)
+            self.path = path
             f.write(self.bit_file)
 
     def close(self):
         """release objects ,fill window ,and clean viewer"""
-        del self.bit_file, self.str_file, self.path, self.ui
         self.ui.textViewer.delete('1.0', 'end')
         self.ui.fillEmptyText()
+        del self.bit_file, self.str_file, self.path, self.ui
 
     def dir(self):
         """Return file's work dir."""
@@ -102,12 +104,14 @@ class ManagerMenu(object):
         self._master = master
         self.open_file_event = main_event.Event()
         self.write_file_event = main_event.Event()
+        self.write_new_file_event = main_event.Event()
         self.open_directory_event = main_event.Event()
         self.close_file_event = main_event.Event()
         # create event
         self._master.add_separator()
         self._master.add_command(label='Open File', command=self.open_file_event.emit)
         self._master.add_command(label='Save File', command=self.write_file_event.emit)
+        self._master.add_command(label='Save File As', command=self.write_new_file_event.emit)
         self._master.add_command(label='Close File', command=self.close_file_event.emit)
         self._master.add_command(label='Open Directory', command=self.open_directory_event.emit)
         # create menu labels
@@ -123,49 +127,53 @@ class Manager(base.BaseExtension):
         log = self._get_element('log')
 
         self._menu = ManagerMenu(self._get_element('UI_WIDGETS>fileMenu'))
-        self._file = TextFile(self._get_element('UI_WIDGETS'), self._get_element('MAIN_WINDOW'))
+        self._file = TextFile(self._get_element('UI_WIDGETS'))
 
         self._menu.open_directory_event.add_callback(self.go_directory)
         self._menu.open_file_event.add_callback(self.open_file)
         self._menu.write_file_event.add_callback(self.save_file)
         self._menu.close_file_event.add_callback(self.close_file)
+        self._menu.write_new_file_event.add_callback(self.save_file_as)
 
     def un_load(self):
         pass
 
-    def open_file(self, event):
-        """关闭上一文件，询问文件位置，初始化新文件，调用全文检查"""
-        self.close_file(None)
+    # ######## extension's requirement function definition end #######
+    # public function definition begin here.
 
-        try:
-            file_path = event.path
-        except AttributeError:
-            file_path = tkinter.filedialog.askopenfilename()
-            if not bool(file_path): return
-
-        self._file = TextFile(self._get_element('UI_WIDGETS'),
-                              self._get_element('MAIN_WINDOW'),
-                              is_new=False,
-                              path=file_path)
+    def open_file(self, event=None):
+        """close the next file ,make sure the path ,call editor"""
+        self.close_file()
+        path = tkinter.filedialog.askopenfilename()
+        if not bool(path): return  # user press cancel
+        self._file = TextFile(self._get_element('UI_WIDGETS'), False, path)
 
         self._get_element('extension_interfaces>core_editor>check')(init=True)
 
-    def save_file(self, event):
-        self._file.save()
-        log('Saved file.')
+    def save_file(self, event=None):
+        """save the file at its origin position ,if new ,file object will ask path"""
+        if self._file is not None:
+            self._file.pull()
+            self._file.write()
 
-    def close_file(self, event):
-        """关闭文件"""
-        try:
+    def save_file_as(self, event=None):
+        """Ask new path and save"""
+        if self._file is not None:
+            new_path = tkinter.filedialog.asksaveasfilename()
+            if not bool(new_path): return  # user press cancel
+            self._file.pull()
+            self._file.write(new_path)
+
+    def close_file(self, event=None):
+        """close now file"""
+        if self._file is not None:
+            if not self._file.compare():
+                user_answer = tkinter.messagebox.askyesno('Save?', 'File had not been saved ,save it right now?')
+                if user_answer: self.save_file()
             self._file.close()
-        except AttributeError as msg:
-            pass  # 多半是在没有打开文件的情况下open，没有上一个文件可关闭
-        finally:
             self._file = None
-            self._get_element('UI_WIDGETS').fillEmptyText()
-            log('Close file.')
 
-    def go_directory(self, event):
+    def go_directory(self, event=None):
         directory_path = self._file.dir()
         os.popen(f'start {directory_path}')
         log(f'Go directory {directory_path}')
