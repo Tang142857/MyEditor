@@ -27,6 +27,10 @@ class TopInterface(object):
 
 class ExtensionsInterface(object):
     """Extensions' public interface, use 'extension_interfaces.extension_name.func' to call"""
+    def del_extension(self, name):
+        setattr(self, name, None)
+        delattr(self, name)
+
     pass  # 各个插件的公共接口
 
 
@@ -70,14 +74,22 @@ def get_element(element_path: str):
         return None
 
 
+def mamage_extension(event=None):
+    mothed, extension_name = dialog.ask_key_value('Extension', 'Manage extension', ['load', 'unload'])
+    if not bool(extension_name): return  # user press cancel
+
+    if mothed == 'load':
+        load_extensions(extension_name)
+    elif mothed == 'unload':
+        un_load_extension(extension_name)
+
+
 def load_extensions(name=''):
     """A function bases on extensions.base.manage to load extensions. Call by: self,ui"""
     if name == '':
         name = dialog.ask_extension_name()
         if name is None:
             return
-    else:
-        pass
 
     extension_interface = manage('load', name, accessor=get_element)
     if extension_interface is not None:
@@ -87,6 +99,17 @@ def load_extensions(name=''):
         print(f'Load extension {name} done!')
     else:
         log(f'Load {name} extension failed.')
+
+
+def un_load_extension(name=''):
+    if name == '':
+        name = dialog.ask_extension_name()
+        if name is None:
+            return
+
+    extension_interface = getattr(extension_interfaces, name)
+    extension_interface.un_load()
+    extension_interfaces.del_extension(name)  # release pointer
 
 
 # protected member function,do not call this function
@@ -111,7 +134,7 @@ if __name__ == '__main__':
     top = _set_top_interface(sys.modules[__name__], dir())
 
     UI_WIDGETS.copyContentEvent.connect(copy_content)
-    UI_WIDGETS.loadExtensionsEvent.connect(load_extensions)
+    UI_WIDGETS.loadExtensionsEvent.connect(mamage_extension)
     # UI connect end
 
     for extensionRunOnceName in RUN_ONCE:

@@ -18,3 +18,5 @@ extension必须具有main模块，并保证含有Extension类，loader通过该�
 建议扩展事件采用Event类，参数列表为(self,event_args,other arg...)  
 屏幕左侧的tool bar分配给了extension，可以往上面放置组件  
 share_memory已上线，可以通过其获取基础编辑器设置（颜色，字体，窗体初始化位置...），直接import就行  
+
+可以unload的扩展，unload方法不为pass，确保带走了所有插入的东西   

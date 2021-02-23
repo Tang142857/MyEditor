@@ -57,8 +57,8 @@ def _create_interface(extension_object):
     """
     public_interface = BaseInterface(extension_object)
     attributes_list = dir(extension_object)
-    attributes_list.remove('on_load')
-    attributes_list.remove('un_load')
+    # attributes_list.remove('on_load')
+    # attributes_list.remove('un_load')
     # needn't load/unload function(usually ,they not call by function except manage)
 
     for attribute_name in attributes_list:
@@ -76,7 +76,6 @@ def manage(kind: str, name: str, **args):
 
     :kind: load or unload
         load: name: extensions' name,accessor = get_element
-        unload: name: extensions' name,extensions_object = extensions_object
 
     :return: extension's interface,or None(for unload)
     """
@@ -95,4 +94,4 @@ def manage(kind: str, name: str, **args):
             return None
 
     elif kind == 'unload':
-        pass  # TODO unload extensions
+        pass  # unload in apply
