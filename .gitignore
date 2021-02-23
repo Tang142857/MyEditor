@@ -10,3 +10,8 @@ Thumbs.db
 
 debug.*
 local.*
+
+# pyinstaller
+/build
+/dist
+*.spec
