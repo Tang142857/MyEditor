@@ -4,7 +4,9 @@ this main file include main menu call back function
 and connect the other event to editor and etc.
 
 @author: Tang142857
-@file: apply.py ,Create at: 2021-02-14
+@project: MyEditor
+@file: apply.py
+@date: 2021-02-23
 Copyright(c): DFSA Software Develop Center
 """
 import os

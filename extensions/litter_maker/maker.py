@@ -6,13 +6,14 @@ BullshitGenerator extension for ME
 @file: maker.py
 @date: 2021-02-23
 """
+import json
 import os
 import random
 import re
-import json
 import tkinter
-from extensions import base
+
 from Element import main_event
+from extensions import base
 
 with open('extensions/litter_maker/data.json', 'r', encoding='utf-8') as f:
     data = json.loads(f.read())

@@ -3,8 +3,11 @@ Base extension for MyEditor
 please create extension by using following classes
 please override all the member function as possible as you can
 
-copyright: DFSA Software Develop Center
-@author: tang142857
+@author: Tang142857
+@project: MyEditor
+@file: base.py
+@date: 2021-02-23
+Copyright(c): DFSA Software Develop Center
 """
 import importlib  # for load extension function
 
